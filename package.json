@@ -1,0 +1,14 @@
+{
+  "name": "bolsa-familia-frontend",
+  "version": "1.0.0",
+  "description": "Sistema web para cadastro e verificação de direito ao Bolsa Família.",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server"
+  },
+  "author": "Sarah,Andre,Beatriz,Carlos e Rafael",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
