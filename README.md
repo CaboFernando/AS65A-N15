@@ -1,4 +1,4 @@
-# Bolsa Familia API
+# Bolsa Familia APP
 
 Este repositório tem como objetivo, armazenamento do código fonte da aplicação de front-end que será consumirá o back-end no projeto da disciplina de AS65A - Certificadora De Competência Identitária N15 (2025_01).
 
