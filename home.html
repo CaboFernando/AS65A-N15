@@ -11,24 +11,32 @@
             <h1>Vereficação de quem tem direito</h1>
         </header>
 
-        <h2> Cadastro de Membros da família</h2>
+    <main>
+        <section class="cadastro-section">
+            <h2>Cadastro de Membros da Família</h2>
+            <form id="form-membros" class="cadastro-form">
+                <input type="text" id="nome-membro" placeholder="Nome completo do membro" required>
+                <input type="text" id="parentesco" placeholder="Parentesco (ex: pai, mãe)" required>
+                <input type="text" id="gênero" placeholder="Gênero (M/F)" required>
+                <input type="text" id="estado-civil" placeholder="Estado civil" required>
+                <input type="text" id="ocupação" placeholder="Ocupação" required>
+                <input type="tel" id="telefone" placeholder="Telefone" required>
+                <input type="number" id="renda" placeholder="Salário (R$)" required step="0.01">
+                <button type="submit">Adicionar Membro</button>
+            </form>
+        </section>
 
-        <form id="form-membros">
-            <input type="text" id="nome-membro" placeholder="Nome completo do membro" required>
-            <input type="text" id="parentesco" placeholder="Parentesco (EX: pai, mãe)"required>
-            <input type="text" id="gênero" placeholder="Gênero (M/F)" required>
-            <input type="text" id="estado-civil" placeholder="Estado Civil" required>
-            <input type="text" id="ocupação" placeholder="Ocupação" required>
-            <input type="number" id="telefone" placeholder="Telefone" required>
-            <input type="number" id="renda" placeholder="Salario" required>
-            <button type="submit">Adicionar Membro</button>
-        </form>
+        <section>
+            <h3>Lista de membros:</h3>
+            <ul id="lista-membros"></ul>
+        </section>
 
-        <h3>Lista de membro: h3>
-        <ul id="lista-membros"</ul>
-        
-        <h3>Resultado</h3>
-        <p id="resultado-renda"></p>
+        <section>
+            <h3>Resultado</h3>
+            <p id="resultado-renda"></p>
+        </section>
+
+    </main>
 
         <script src="js/home.js"></script>
         

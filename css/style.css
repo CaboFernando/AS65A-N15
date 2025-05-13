@@ -22,44 +22,111 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+#Logo {
+  width: 60%;
+  height: auto;
+  display: block;
+  margin: auto;
+}
+
+
+
 /* Títulos */
-h1, h2 {
+h1{
   text-align: center;
   margin-bottom: 20px;
   color: #696969;
 }
 
-/* Formulários */
+h2 {
+  color: #241313;
+}
+
+p {
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1rem; 
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 1em;
+}
+
+hr {
+  border-bottom: 3px solid black;
+}
+
+
+.login-campos {
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.login-campos input {
+  flex: 1px;
+  min-width: 150px;
+}
+
 form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
+}
+
+legend {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+  text-align: center;
 }
 
 label {
-  font-weight: bold;
-  margin-top: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+  color: #444;
 }
 
 input, select {
-  padding: 8px;
+  padding: 0.75rem;
   border: 1px solid #ccc;
   border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  border-color: #0066cc;
+  outline: none;
 }
 
 /* Botões */
 button {
-  padding: 10px;
-  background: #F08080;
-  color: #363636;
+  padding: 0.75rem;
+  background-color: #0066cc;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background: #09703e;
+  background-color: #004999;
 }
 
 /* Links */
@@ -113,3 +180,59 @@ a:hover {
   margin-bottom: 20px;
   border-radius: 8px;
 }
+
+/* Formulario do home, parte do cadastro de membros*/
+
+.cadastro-section {
+  margin-top: 2rem;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cadastro-titulo {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.campo-input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.campo-input:focus {
+  border-color: #0066cc;
+  outline: none;
+}
+
+.botao-cadastro {
+  padding: 0.75rem;
+  background-color: #0066cc;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.botao-cadastro:hover {
+  background-color: #004999;
+}
+
