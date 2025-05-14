@@ -55,22 +55,13 @@ hr {
 }
 
 
-.login-campos {
-  display:flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
 
-.login-campos input {
-  flex: 1px;
-  min-width: 150px;
-}
 
 form {
-  max-width: 400px;
+  max-width: 500px;
   margin: 0 auto;
-  padding: 2rem;
-  background-color: #f9f9f9;
+  padding: 5rem;
+  background-color: #cac8c89a;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -137,6 +128,42 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+
+.login-campos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0.75rem;
+  background-color: #d9dde0;
+  color: #333; 
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+/* Estilo dos inputs dentro de .login-campos */
+.login-campos input {
+  flex: 1; 
+  min-width: 150px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
+#login-form {
+  max-width: 650px;
+  margin: 0 auto; 
+}
+
+
+.login-campos:hover {
+  background-color: #636666;
+  color: #fff; 
 }
 
 /* Mensagem de resultado */
