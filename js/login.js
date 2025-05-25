@@ -1,21 +1,20 @@
 document.getElementById("login-form").addEventListener("submit", function(e) {
     e.preventDefault();
-    
+
     const login = document.getElementById("login").value.trim();
     const senha = document.getElementById("senha").value;
 
-    if(!login || !senha){
-        alert("Por favor, preencha todos os campos")
+    if (!login || !senha) {
+        alert("Por favor, preencha todos os campos");
         return;
     }
 
-    let payload = {senha: senha};
+    let payload = { senha: senha };
 
     const cpfLimpo = login.replace(/\D/g, "");
-    if (cpfLimpo.length === 11){   // CPF tem que ter 11 digitos
+    if (cpfLimpo.length === 11) {
         payload.cpf = cpfLimpo;
-    } 
-    else{
+    } else {
         const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(login);
         if (!emailValido) {
             alert("Digite um CPF válido (11 números) ou um e-mail válido.");
@@ -24,16 +23,25 @@ document.getElementById("login-form").addEventListener("submit", function(e) {
         payload.email = login;
     }
 
-    fetch('api/login' ,{
+    fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/auth/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({payload})
+        body: JSON.stringify(payload)
     })
     .then(res => {
-        if(res.ok) return window.location.href = "home.html";
-        alert("Login invalido");
+        if (res.ok) {
+            return res.json();
+        } else {
+            throw new Error("Login inválido");
+        }
     })
-    .catch(err=> alert("Erro ao conectar com o servidor."))
+    .then(data => {
+        localStorage.setItem("usuarioId", data.usuarioId); // Ajuste conforme a resposta da API
+        window.location.href = "home.html";
+    })
+    .catch(err => {
+        alert(err.message || "Erro ao conectar com o servidor.");
+    });
 });

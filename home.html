@@ -14,12 +14,12 @@
     <main>
         <section class="cadastro-section">
             <h2>Cadastro de Membros da Família</h2>
-            <form id="form-membros" class="cadastro-form">
-                <input type="text" id="nome-membro" placeholder="Nome completo do membro" required>
+            <form id="familia-form" class="cadastro-form">
+                <input type="text" id="nomeMembro" placeholder="Nome completo do membro" required>
                 <input type="text" id="parentesco" placeholder="Parentesco (ex: pai, mãe)" required>
-                <input type="text" id="gênero" placeholder="Gênero (M/F)" required>
-                <input type="text" id="estado-civil" placeholder="Estado civil" required>
-                <input type="text" id="ocupação" placeholder="Ocupação" required>
+                <input type="text" id="sexo" placeholder="M (Masculino) ou F (Feminino)" required>
+                <input type="text" id="estadoCivil" placeholder="Estado civil" required>
+                <input type="text" id="ocupacao" placeholder="Ocupação" required>
                 <input type="tel" id="telefone" placeholder="Telefone" required>
                 <input type="number" id="renda" placeholder="Salário (R$)" required step="0.01">
                 <button type="submit">Adicionar Membro</button>
@@ -34,6 +34,15 @@
         <section>
             <h3>Resultado</h3>
             <p id="resultado-renda"></p>
+        </section>
+
+        <section>
+            <button id="btn-concluir">Concluir Família</button>
+            <button type="button" onclick="window.location.href='familias.html'">Ver Famílias Cadastradas</button>
+        </section>
+
+        <section id="familias-container">
+            <h2>Famílias cadastradas</h2>
         </section>
 
     </main>
