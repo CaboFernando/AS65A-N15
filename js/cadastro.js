@@ -5,6 +5,11 @@ document.getElementById("cadastro-form").addEventListener("submit", function(e) 
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
 
+    if (!nome || !cpf || !email || !senha) {
+        alert("Todos os campos são obrigatórios.");
+        return;
+    }
+
     fetch('api/cadastro' ,{
         method: 'POST',
         headers: {
