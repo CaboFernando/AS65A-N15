@@ -10,7 +10,7 @@ document.getElementById("cadastro-form").addEventListener("submit", function(e) 
         return;
     }
 
-    fetch('api/cadastro' ,{
+    fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Usuarios' ,{
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

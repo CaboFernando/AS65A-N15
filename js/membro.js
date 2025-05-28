@@ -34,7 +34,7 @@ form.addEventListener("submit", function (e) {
     //Faz o envio dos dados para o backend
     const usuarioId = localStorage.getItem("usuarioId");
 
-    fetch("htttp://localhost:3000/familia",{
+    fetch("https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes",{
         method:POST,
         headers: {"Content-Type": "application/json"},
         body:JSON.stringify({usuarioId, membros})
