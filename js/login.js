@@ -23,7 +23,7 @@ document.getElementById("login-form").addEventListener("submit", function(e) {
         payload.email = login;
     }
 
-    fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/auth/login', {
+    fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Auths/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
