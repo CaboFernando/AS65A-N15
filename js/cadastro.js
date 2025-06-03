@@ -26,7 +26,7 @@ document.getElementById("cadastro-form").addEventListener("submit", function(e) 
     })
     .then(res => {
         if (res.ok) {
-            window.location.href = "login.html";
+            window.location.href = "index.html";
         } else {
             alert("Erro ao cadastrar. Verifique os dados e tente novamente.");
         }
