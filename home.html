@@ -1,41 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <title>Gerenciador de membros</title>
-        <link rel="stylesheet" href="css/style.css">
-    </head>
-    <body>
-        <header>
-            <img src="img/grafico.png" alt="Divisão da população brasileira" id="grafico">
-            <h1>Vereficação de quem tem direito</h1>
-        </header>
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciador de membros</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <img src="img/grafico.png" alt="Divisão da população brasileira" id="grafico">
+        <h1>Verificação de quem tem direito</h1>
+    </header>
 
-        <h2> Cadastro de Membros da família</h2>
+    <main>
+        <section class="cadastro-section">
+            <h2>Cadastro de Membros da Família</h2>
+            <form id="familia-form" class="cadastro-form">
+                <input type="text" id="nomeMembro" placeholder="Nome completo do membro" required>
+                <input type="text" id="parentesco" placeholder="Parentesco (ex: pai, mãe)" required>
+                <input type="text" id="sexo" placeholder="M (Masculino) ou F (Feminino)" required>
+                <input type="text" id="estadoCivil" placeholder="Estado civil" required>
+                <input type="text" id="ocupacao" placeholder="Ocupação" required>
+                <input type="tel" id="telefone" placeholder="Telefone" required>
+                <input type="number" id="renda" placeholder="Salário (R$)" required step="0.01">
+                <button type="submit">Adicionar Membro</button>
+            </form>
+        </section>
 
-        <form id="form-membros">
-            <input type="text" id="nome-membro" placeholder="Nome completo do membro" required>
-            <input type="text" id="parentesco" placeholder="Parentesco (EX: pai, mãe)"required>
-            <input type="text" id="gênero" placeholder="Gênero (M/F)" required>
-            <input type="text" id="estado-civil" placeholder="Estado Civil" required>
-            <input type="text" id="ocupação" placeholder="Ocupação" required>
-            <input type="number" id="telefone" placeholder="Telefone" required>
-            <input type="number" id="renda" placeholder="Salario" required>
-            <button type="submit">Adicionar Membro</button>
-        </form>
+        <section>
+            <h3>Lista de membros:</h3>
+            <ul id="lista-membros"></ul>
+        </section>
 
-        <h3>Lista de membro: </h3>
-        <ul id="lista-membros"></ul>
-        
-        <h3>Resultado: </h3>
-        <p id="resultado-renda"></p>
-        
-        <div>
-            <button onclick="window.location.href='index.html'">Voltar</button>
-        </div>
-        
+        <section>
+            <h3>Resultado</h3>
+            <p id="resultado-renda"></p>
+        </section>
 
-        <script src="js/home.js"></script>
-        
-    </body> 
+        <section>
+            <button id="btn-concluir">Concluir Família</button>
+            <button type="button" onclick="window.location.href='familias.html'">Ver Famílias Cadastradas</button>
+            <button type="button" onclick="window.location.href='index.html'">Voltar</button>
+        </section>
+
+        <section id="familias-container">
+            <h2>Famílias cadastradas</h2>
+        </section>
+    </main>
+
+    <script src="js/home.js"></script>
+</body>
 </html>

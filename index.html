@@ -1,46 +1,72 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <head>
-        <meta charget= "UTF-8"/>
-        <title> Bolsa Familia</title>
-        <link rel="stylesheet" href="css/style.css">
-    </head>
-    <body>
+<head>
+    <meta charget="UTF-8" />
+    <title> Bolsa Familia</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <section>
+        <form id="login-form">
+            <div class = "login-campos">
+                <h2>Login:</h2>
+                <input type="text" id="login" placeholder="Email ou CPF">
+                <input type="password" id="senha" placeholder="Senha">
+                <button type="submit">Entrar</button>
+                <button type="button" onclick="window.location.href='cadastro.html'">Cadastrar</button>
+            </div>
+        </form>
+    </section><br>
+
+    <hr>
+    
+    <br>
         <header>
-            <img src="img/logo.png"  alt="logo pagina" id="Logo">
+            <img src="img/logo.png"  alt="logo pagina" id="Logo"><br>
             <h1>Programa Bolsa Familia</h1>
         </header>
-        <p>O programa Bolsa Família é um programa de transferência de renda com condicionalidades na saúde e na educação.
-            São elegíveis ao Programa Bolsa Família as famílias inscritas no Cadastro Único em situação de pobreza, com renda per capita de até R$ 218,00 (duzentos e dezoito reais).As famílias beneficiárias no Programa Bolsa Família devem cumprir as seguintes condicionalidades:
-            Na saúde:
-            – Realização de pré-natal, quando grávida;
-            – Cumprimento do calendário nacional de vacinação; e
-            – Acompanhamento do estado nutricional das crianças com 07 anos incompletos.
+        
+        <section>
+            <p>
+                 O Programa Bolsa Família é uma iniciativa de transferência de renda com condicionalidades nas áreas de saúde e educação. São elegíveis ao programa as famílias inscritas no Cadastro Único que estejam em situação de pobreza, com renda per capita de até R$ 218,00 (duzentos e dezoito reais).
+            </p>
 
-            Na educação:
-            – Frequência escolar mínima de 60% (sessenta por cento) para as crianças de quatro e cinco anos de idade;
-            – Frequência escolar mínima de 75% (setenta e cinco por cento) para crianças e adolescentes de seis a dezessete anos de idade;
+            <br>
 
-            A parcela mensal recebida em dinheiro pela família beneficiária do programa é composta pela soma dos seguintes benefícios:
-            – Benefício Renda de Cidadania (por pessoa) + Benefício complementar para atingir o piso de R$ 600,00 (se for o caso);
-            – Benefício de Primeira Infância por criança até 6 anos no valor de R$ 150,00;
-            – Benefício Variável familiar para gestantes, nutriz, crianças e adolescentes com idade entre 7 e 17 anos de R$ 50,00.
+            <p><strong>Na saúde:</strong></p>
 
-            Regra de Proteção do Bolsa Família
+            <br>
 
-            A Regra de Proteção garante a permanência da família no programa por até 24 meses mesmo que tenha aumento de renda, até o limite de meio salário mínimo per capita familiar. Neste período, a família receberá o equivalente a 50% da parcela que recebe no programa. Se a família perder renda, ficando abaixo de R$ 218 per capita familiar novamente, terá direito ao Retorno Garantido ao programa de forma integral.
-        </p>
-        <p>Número corresponde a 34,1% de todos os inscritos; não há limite para permanência no programa, mas o governo diz incentivar a saída. Das 20,6 milhões de famílias inscritas no Bolsa Família, 7 milhões recebem dinheiro do programa há 10 anos ou mais, com dados de fevereiro de 2025.</p>
+            <ul>
+                <li>Realização de pré-natal, no caso de gestantes;</li>
+                <li>Cumprimento do calendário nacional de vacinação;</li>
+                <li>Acompanhamento do estado nutricional de crianças com menos de 7 anos.</li>
+            </ul>
 
-        <h2> Login</h2>
-        <form id="login-form">
-            <input type="text" id="cpf" placeholder="CPF (opcional)">
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="senha" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-            <button onClick="window.location.href='cadastro.html'">Cadastrar</button>
-        </form>
+            <p><strong>Na educação:</strong></p>
+            <ul>
+                <li>Frequência escolar mínima de 60% para crianças de 4 e 5 anos de idade;</li>
+                <li>Frequência escolar mínima de 75% para crianças e adolescentes entre 6 e 17 anos.</li>
+            </ul>
 
-        <script src="js/login.js"></script>
-    </body>
+            <p>A parcela mensal recebida pela família é composta pela soma dos seguintes benefícios:</p>
+            <ul>
+                <li>Benefício Renda de Cidadania (por pessoa) + Benefício Complementar, quando necessário, para atingir o piso de R$ 600,00;</li>
+                <li>Benefício Primeira Infância: R$ 150,00 por criança de até 6 anos;</li>
+                <li>Benefício Variável Familiar: R$ 50,00 para gestantes, nutrizes, crianças e adolescentes entre 7 e 17 anos.</li>
+            </ul>
+            <br>
+            <p>
+                <strong>Regra de Proteção do Bolsa Família:</strong><br>
+                A Regra de Proteção garante a permanência da família no programa por até 24 meses, mesmo em caso de aumento de renda, desde que o valor não ultrapasse meio salário mínimo per capita. Durante esse período, a família receberá 50% do valor do benefício. Se a renda voltar a cair abaixo de R$ 218,00 por pessoa, a família terá direito ao retorno integral ao programa.
+            </p>
+
+            <p>
+                Atualmente, 34,1% de todos os inscritos estão no programa há 10 anos ou mais. Não há um limite de permanência, mas o governo incentiva a saída gradativa. De acordo com dados de fevereiro de 2025, das 20,6 milhões de famílias cadastradas, 7 milhões recebem o benefício há mais de uma década.
+            </p>
+    </section>
+
+    <script src="js/login.js"></script>
+</body>
 </html>
