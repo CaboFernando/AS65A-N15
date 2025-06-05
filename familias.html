@@ -6,57 +6,13 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1>Famílias Cadastradas</h1>
+    <header>
+        <h1>Famílias Cadastradas</h1>
+        <button onclick="window.location.href='home.html'">Voltar</button>
+    </header>
 
-    <a href="home.html">
-        <button type="button">Voltar</button>
-    </a>
-    
     <section id="familias-container"></section>
 
-    <script>
-        // Simulação do armazenamento local de famílias (você pode adaptar para usar API)
-        const familias = JSON.parse(localStorage.getItem("familiasCadastradas")) || [];
-
-        const container = document.getElementById("familias-container");
-
-        function renderizarFamilias() {
-            container.innerHTML = "";
-
-            familias.forEach((familia, index) => {
-                const total = familia.reduce((soma, membro) => soma + membro.renda, 0);
-                const perCapita = total / familia.length;
-                const resultado = perCapita <= 218
-                    ? "TEM direito ao Bolsa Família"
-                    : "NÃO tem direito ao Bolsa Família";
-
-                const card = document.createElement("div");
-                card.className = "familia-card";
-
-                card.innerHTML = `
-                    <h3>Família #${index + 1}</h3>
-                    <ul class="membros-list">
-                        ${familia.map(m => `<li>${m.nomeMembro} (${m.parentesco}) - R$${m.renda.toFixed(2)}</li>`).join('')}
-                    </ul>
-                    <p><strong>Renda total:</strong> R$${total.toFixed(2)}</p>
-                    <p><strong>Renda per capita:</strong> R$${perCapita.toFixed(2)}</p>
-                    <p><strong>Resultado:</strong> ${resultado}</p>
-                    <button class="remove-btn" onclick="removerFamilia(${index})">Remover</button>
-                `;
-
-                container.appendChild(card);
-            });
-        }
-
-        function removerFamilia(index) {
-            if (confirm("Deseja remover esta família?")) {
-                familias.splice(index, 1);
-                localStorage.setItem("familiasCadastradas", JSON.stringify(familias));
-                renderizarFamilias();
-            }
-        }
-
-        renderizarFamilias();
-    </script>
+    <script src="js/familias.js"></script>
 </body>
 </html>

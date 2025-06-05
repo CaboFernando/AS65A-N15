@@ -1,6 +1,7 @@
 document.getElementById("login-form").addEventListener("submit", function(e) {
     e.preventDefault();
 
+
     const login = document.getElementById("login").value.trim();
     const senha = document.getElementById("senha").value;
 
@@ -38,8 +39,9 @@ document.getElementById("login-form").addEventListener("submit", function(e) {
         }
     })
     .then(data => {
-        localStorage.setItem("usuarioId", data.usuarioId); // Ajuste conforme a resposta da API
-        window.location.href = "home.html";
+        localStorage.setItem("token", data.token); // Ajuste conforme a resposta da API
+        localStorage.setItem("usuarioId", data.usuarioId) // Armazena o ID do usuário
+        window.location.href = "home.html"; 
     })
     .catch(err => {
         alert(err.message || "Erro ao conectar com o servidor.");

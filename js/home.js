@@ -4,6 +4,18 @@ const resultado = document.getElementById("resultado-renda");
 
 let membros = [];
 
+ function logout() {
+            localStorage.removeItem("token");
+            window.location.href = "index.html";  // Redireciona para a página de login
+        }
+
+const token = localStorage.getItem("token");
+
+if(!token) {
+    alert("Você precisa estar autenticado para cadastrar a familia");
+    window.location.href = "index.html"; // redireciona para o login, caso não tenha token
+}
+
 form.addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -40,7 +52,8 @@ form.addEventListener("submit", function (e) {
     fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes', { 
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ usuarioId, membros })
     })
@@ -96,11 +109,25 @@ document.getElementById("btn-concluir").addEventListener("click", function () {
     familiasSalvas.push(membros);
     localStorage.setItem("familiasCadastradas", JSON.stringify(familiasSalvas));
 
-    alert("Família cadastrada com sucesso!");
-    membros = [];
-    atualizarLista();
-    resultado.textContent = "";
-    
+    fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes', {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ usuarioId: localStorage.getItem("usuarioId"), membros })
+    })
+    .then(res => {
+        if (res.ok) {
+            alert("Família cadastrada com sucesso!");
+            membros = [];  // Limpa os membros após o cadastro
+            atualizarLista();
+            resultado.textContent = "";
+        } else {
+            console.error("Erro ao cadastrar a família.");
+        }
+    })
+    .catch(err => console.error("Erro de conexão:", err));
 });
 
 
