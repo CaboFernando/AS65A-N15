@@ -40,7 +40,10 @@ document.getElementById("login-form").addEventListener("submit", function(e) {
     })
     .then(data => {
         localStorage.setItem("token", data.token); // Ajuste conforme a resposta da API
-        localStorage.setItem("usuarioId", data.usuarioId); // Armazena o ID do usuário
+        localStorage.setItem("idUsuario", data.idUsuario); // Armazena o ID do usuário
+
+        console.log("ID do usuário salvo:", data.idUsuario);
+
         window.location.href = "home.html"; 
     })
     .catch(err => {
