@@ -4,77 +4,28 @@ const resultado = document.getElementById("resultado-renda");
 
 let membros = [];
 
- function logout() {
-            localStorage.removeItem("token");
-            window.location.href = "index.html";  // Redireciona para a página de login
-        }
+function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "index.html"; // Redireciona para a página de login
+}
 
 const token = localStorage.getItem("token");
 
-if(!token) {
+if (!token) {
     alert("Você precisa estar autenticado para cadastrar a familia");
     window.location.href = "index.html"; // redireciona para o login, caso não tenha token
 }
 
-form.addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const nomeMembro = document.getElementById("nomeMembro").value.trim();
-    const parentesco = document.getElementById("parentesco").value.trim();
-    const sexo = document.getElementById("sexo").value.trim();
-    const estadoCivil = document.getElementById("estadoCivil").value.trim();
-    const ocupacao = document.getElementById("ocupacao").value.trim();
-    const telefone = document.getElementById("telefone").value.trim();
-    const renda = parseFloat(document.getElementById("renda").value);
-
-    if (!nomeMembro || !parentesco || !sexo || !estadoCivil || !ocupacao || !telefone || isNaN(renda)) {
-        alert("Por favor, preencha todos os campos corretamente.");
-        return;
-    }
-
-    const novoMembro = {
-        nomeMembro,
-        parentesco,
-        sexo,
-        estadoCivil,
-        ocupacao,
-        telefone,
-        renda
-    };
-
-    membros.push(novoMembro);
-    atualizarLista();
-    calcularRenda();
-
-    // Envia os dados para o backend
-    const usuarioId = localStorage.getItem("usuarioId"); // ajuste conforme seu armazenamento
-
-    fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes', { 
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ usuarioId, membros })
-    })
-    .then(res => {
-        if (res.ok) {
-            console.log("Dados enviados com sucesso.");
-        } else {
-            console.error("Erro ao enviar dados.");
-        }
-    })
-    .catch(err => console.error("Erro de conexão:", err));
-
-    form.reset();
-});
+// =========================================================
+// Mova as definições das funções para AQUI (antes de serem chamadas)
+// =========================================================
 
 function atualizarLista() {
     lista.innerHTML = "";
 
     membros.forEach(membro => {
         const li = document.createElement("li");
-        li.textContent = `${membro.nomeMembro} - ${membro.parentesco} - ${membro.sexo} - R$${membro.renda.toFixed(2)}`;
+        li.textContent = `${membro.Nome} - ${membro.GrauParentesco} - ${membro.Sexo} - R$${membro.Renda.toFixed(2)}`;
         lista.appendChild(li);
     });
 }
@@ -85,7 +36,7 @@ function calcularRenda() {
         return;
     }
 
-    const total = membros.reduce((soma, membro) => soma + membro.renda, 0);
+    const total = membros.reduce((soma, membro) => soma + membro.Renda, 0);
     const perCapita = total / membros.length;
 
     let mensagem = `Renda total: R$${total.toFixed(2)} | Renda per capita: R$${perCapita.toFixed(2)}. `;
@@ -99,35 +50,79 @@ function calcularRenda() {
     resultado.textContent = mensagem;
 }
 
+// =========================================================
+// O addEventListener vem depois das funções serem definidas
+// =========================================================
+
+form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const nome = document.getElementById("nome").value.trim();
+    const grauParentesco = document.getElementById("grauParentesco").value.trim();
+    const sexo = document.getElementById("sexo").value.trim();
+    const estadoCivil = document.getElementById("estadoCivil").value.trim();
+    const cpf = document.getElementById("cpf").value.trim();
+    const ocupacao = document.getElementById("ocupacao").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+    const renda = parseFloat(document.getElementById("renda").value);
+
+    if (!nome || !grauParentesco || !sexo || !estadoCivil || !cpf || !ocupacao || !telefone || isNaN(renda)) {
+        alert("Por favor, preencha todos os campos corretamente.");
+        return;
+    }
+
+    const novoMembro = {
+        Nome: nome,
+        GrauParentesco: grauParentesco,
+        Sexo: sexo, // Cuidado se o backend espera um int aqui
+        EstadoCivil: estadoCivil, // Cuidado se o backend espera um int aqui
+        Cpf: cpf,
+        Ocupacao: ocupacao,
+        Telefone: telefone,
+        Renda: renda
+    };
+
+    membros.push(novoMembro);
+    atualizarLista(); // Chamada aqui
+    calcularRenda();  // Chamada aqui
+
+    form.reset();
+});
+
+
 document.getElementById("btn-concluir").addEventListener("click", function () {
     if (membros.length === 0) {
         alert("Adicione ao menos um membro.");
         return;
     }
 
-    const familiasSalvas = JSON.parse(localStorage.getItem("familiasCadastradas")) || [];
-    familiasSalvas.push(membros);
-    localStorage.setItem("familiasCadastradas", JSON.stringify(familiasSalvas));
-
+    const usuarioId = localStorage.getItem("usuarioId");
     fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes', {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ usuarioId: localStorage.getItem("usuarioId"), membros })
+        body: JSON.stringify({ UsuarioId: usuarioId, Parentes: membros })
     })
     .then(res => {
         if (res.ok) {
             alert("Família cadastrada com sucesso!");
-            membros = [];  // Limpa os membros após o cadastro
+            membros = [];
             atualizarLista();
             resultado.textContent = "";
         } else {
-            console.error("Erro ao cadastrar a família.");
+            res.json().then(errorData => {
+                console.error("Erro ao cadastrar a família:", errorData);
+                alert("Erro ao cadastrar a família. Detalhes no console.");
+            }).catch(() => {
+                console.error("Erro ao cadastrar a família. Status:", res.status);
+                alert("Erro ao cadastrar a família. Verifique o console.");
+            });
         }
     })
-    .catch(err => console.error("Erro de conexão:", err));
+    .catch(err => {
+        console.error("Erro de conexão:", err);
+        alert("Erro de conexão com o servidor. Tente novamente.");
+    });
 });
-
-
