@@ -4,64 +4,31 @@ const resultado = document.getElementById("resultado-renda");
 
 let membros = [];
 
-form.addEventListener("submit", function (e) {
-    e.preventDefault();
+function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "index.html"; // Redireciona para a página de login
+}
 
-    const nomeMembro = document.getElementById("nomeMembro").value.trim();
-    const parentesco = document.getElementById("parentesco").value.trim();
-    const sexo = document.getElementById("sexo").value.trim();
-    const estadoCivil = document.getElementById("estadoCivil").value.trim();
-    const ocupacao = document.getElementById("ocupacao").value.trim();
-    const telefone = document.getElementById("telefone").value.trim();
-    const renda = parseFloat(document.getElementById("renda").value);
+const token = localStorage.getItem("token");
 
-    if (!nomeMembro || !parentesco || !sexo || !estadoCivil || !ocupacao || !telefone || isNaN(renda)) {
-        alert("Por favor, preencha todos os campos corretamente.");
-        return;
-    }
+if (!token) {
+    alert("Você precisa estar autenticado para cadastrar a família");
+    window.location.href = "index.html"; // redireciona para o login, caso não tenha token
+}
 
-    const novoMembro = {
-        nomeMembro,
-        parentesco,
-        sexo,
-        estadoCivil,
-        ocupacao,
-        telefone,
-        renda
-    };
-
-    membros.push(novoMembro);
-    atualizarLista();
-    calcularRenda();
-
-    // Envia os dados para o backend
-    const usuarioId = localStorage.getItem("usuarioId"); // ajuste conforme seu armazenamento
-
-    fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes', { 
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ usuarioId, membros })
-    })
-    .then(res => {
-        if (res.ok) {
-            console.log("Dados enviados com sucesso.");
-        } else {
-            console.error("Erro ao enviar dados.");
-        }
-    })
-    .catch(err => console.error("Erro de conexão:", err));
-
-    form.reset();
-});
+// =========================================================
+// Definições das funções
+// =========================================================
 
 function atualizarLista() {
     lista.innerHTML = "";
 
     membros.forEach(membro => {
+        const renda = Number(membro.renda);
+        const rendaFormatada = !isNaN(renda) ? renda.toFixed(2) : "0.00";
+
         const li = document.createElement("li");
-        li.textContent = `${membro.nomeMembro} - ${membro.parentesco} - ${membro.sexo} - R$${membro.renda.toFixed(2)}`;
+        li.textContent = `${membro.nome} - ${membro.grauParentesco} - ${membro.sexo} - R$${rendaFormatada}`;
         lista.appendChild(li);
     });
 }
@@ -86,21 +53,113 @@ function calcularRenda() {
     resultado.textContent = mensagem;
 }
 
-document.getElementById("btn-concluir").addEventListener("click", function () {
+async function cadastrarFamilia(membros) {
+    const sexoMap = { "M": 1, "F": 2, "Outro": 3, "NaoInformado": 0 };
+    const estadoCivilMap = {
+        "NaoInformado": 0,
+        "Solteiro": 1,
+        "Casado": 2,
+        "Divorciado": 3,
+        "Viuvo": 4,
+        "UniaoEstavel": 5
+    };
+
+    for (const membro of membros) {
+        const body = {
+            nome: membro.nome,
+            cpf: membro.cpf.replace(/\D/g, ""), // Remove qualquer caractere não numérico
+            grauParentesco: membro.grauParentesco,
+            sexo: sexoMap[membro.sexo] ?? 0,
+            estadoCivil: estadoCivilMap[membro.estadoCivil] ?? 0,
+            ocupacao: membro.ocupacao,
+            telefone: membro.telefone,
+            renda: membro.renda
+        };
+
+        const response = await fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Erro ao cadastrar membro ${membro.nome}: ${errorData.message || response.statusText}`);
+        }
+    }
+}
+
+// =========================================================
+// Evento de envio do formulário
+// =========================================================
+
+form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const nome = document.getElementById("nome").value.trim();
+    const grauParentesco = document.getElementById("grauParentesco").value.trim();
+    const sexo = document.getElementById("sexo").value.trim();
+    const estadoCivil = document.getElementById("estadoCivil").value.trim();
+    const cpf = document.getElementById("cpf").value.trim();
+    const ocupacao = document.getElementById("ocupacao").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+    const renda = parseFloat(document.getElementById("renda").value.replace(',', '.'));
+
+    if (!nome || !grauParentesco || !sexo || !estadoCivil || !cpf || !ocupacao || !telefone || isNaN(renda)) {
+        alert("Por favor, preencha todos os campos corretamente.");
+        return;
+    }
+
+    const novoMembro = {
+        nome: nome,
+        grauParentesco: grauParentesco,
+        sexo: sexo,
+        estadoCivil: estadoCivil,
+        cpf: cpf,
+        ocupacao: ocupacao,
+        telefone: telefone,
+        renda: renda
+    };
+
+    console.log("Novo membro:", novoMembro);
+
+    membros.push(novoMembro);
+    atualizarLista(); // Atualiza a lista de membros
+    calcularRenda();  // Atualiza o cálculo da renda
+
+    form.reset(); // Limpa os campos do formulário
+});
+
+// =========================================================
+// Evento do botão "Concluir Família"
+// =========================================================
+
+document.getElementById("btn-concluir").addEventListener("click", async () => {
     if (membros.length === 0) {
         alert("Adicione ao menos um membro.");
         return;
     }
 
-    const familiasSalvas = JSON.parse(localStorage.getItem("familiasCadastradas")) || [];
-    familiasSalvas.push(membros);
-    localStorage.setItem("familiasCadastradas", JSON.stringify(familiasSalvas));
-
-    alert("Família cadastrada com sucesso!");
-    membros = [];
-    atualizarLista();
-    resultado.textContent = "";
-    
+    try {
+        await cadastrarFamilia(membros);
+        alert("Família cadastrada com sucesso!");
+        membros = []; // Limpa a lista de membros após o cadastro
+        atualizarLista(); // Atualiza a lista vazia
+        resultado.textContent = ""; // Limpa o resultado de renda
+    } catch (error) {
+        alert(error.message);
+        console.error(error);
+    }
 });
 
+// =========================================================
+// Função de logout
+// =========================================================
 
+function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "index.html"; // Redireciona para a página de login
+}

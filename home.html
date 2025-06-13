@@ -15,10 +15,11 @@
         <section class="cadastro-section">
             <h2>Cadastro de Membros da Família</h2>
             <form id="familia-form" class="cadastro-form">
-                <input type="text" id="nomeMembro" placeholder="Nome completo do membro" required>
-                <input type="text" id="parentesco" placeholder="Parentesco (ex: pai, mãe)" required>
+                <input type="text" id="nome" placeholder="Nome completo do membro" required>
+                <input type="text" id="grauParentesco" placeholder="Parentesco (ex: pai, mãe)" required>
                 <input type="text" id="sexo" placeholder="M (Masculino) ou F (Feminino)" required>
                 <input type="text" id="estadoCivil" placeholder="Estado civil" required>
+                <input type="text" id="cpf" placeholder="Cpf" required>
                 <input type="text" id="ocupacao" placeholder="Ocupação" required>
                 <input type="tel" id="telefone" placeholder="Telefone" required>
                 <input type="number" id="renda" placeholder="Salário (R$)" required step="0.01">
@@ -39,7 +40,7 @@
         <section>
             <button id="btn-concluir">Concluir Família</button>
             <button type="button" onclick="window.location.href='familias.html'">Ver Famílias Cadastradas</button>
-            <button type="button" onclick="window.location.href='index.html'">Voltar</button>
+            <button onclick="logout()">Sair</button> 
         </section>
 
         <section id="familias-container">
