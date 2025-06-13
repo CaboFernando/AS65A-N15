@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrativo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin-style.css">
+    <script src="/js/admin.js"></script>
+</head>
+<body>
+<div class="container">
+    <!-- Loading -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="notification success" id="success-notification"><span id="success-message"></span></div>
+    <div class="notification error" id="error-notification"><span id="error-message"></span></div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal" id="logout-modal">
+        <div class="modal-content">
+            <h3>Confirmar Saída</h3>
+            <p>Tem certeza que deseja sair do sistema?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="logout-cancel">Cancelar</button>
+                <button class="modal-btn confirm" id="logout-confirm">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Admin</h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" data-target="config-section">Configurações</div>
+            <div class="menu-item" data-target="users-section">Usuários</div>
+            <div class="menu-item" id="logout-btn">Sair</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Painel Administrativo</h1>
+        </div>
+
+        <div class="section active" id="config-section">
+            <div class="card">
+                <div class="card-header">Configurações</div>
+                <div class="card-body">
+                    <div class="config-display">
+                        <div class="config-item">
+                            <div class="config-label">Valor Base:</div>
+                            <div class="config-value" id="config-valor-base">...</div>
+                        </div>
+                        <div class="config-item">
+                            <div class="config-label">Tipos de Parentesco:</div>
+                            <div class="config-value" id="config-parentescos">...</div>
+                        </div>
+                        
+                        <div class="config-actions">
+                            <button id="edit-config-btn" class="btn btn-edit">
+                                <i class="fas fa-edit"></i> Editar Configurações
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="config-edit">
+                        <form id="config-form">
+                            <input type="hidden" id="config-edit-id">
+                            <div class="form-group">
+                                <label for="valorBase">Valor Base Renda Per Capita</label>
+                                <input type="number" class="form-control" id="valorBase" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tiposParentesco">Tipos de Parentesco Permitidos</label>
+                                <textarea class="form-control" id="tiposParentesco" rows="4" required></textarea>
+                            </div>
+                            
+                            <div class="config-actions">
+                                <button type="button" id="cancel-edit-btn" class="btn btn-cancel">Cancelar</button>
+                                <button type="submit" class="btn btn-edit">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="users-section">
+            <div class="card">
+                <div class="card-header">Usuários</div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="users-table">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Email</th>
+                                <th>Tipo</th>
+                                <th>Parentes</th>
+                            </tr>
+                            </thead>
+                            <tbody>                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
