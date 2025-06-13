@@ -1,28 +1,340 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Administrativo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin-style.css">
-    <script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding: 20px 0;
+        }
+        .sidebar-header {
+            text-align: center;
+            padding: 20px;
+        }
+        .sidebar-menu .menu-item {
+            padding: 15px 25px;
+            cursor: pointer;
+        }
+        .sidebar-menu .menu-item:hover,
+        .sidebar-menu .menu-item.active {
+            background-color: #34495e;
+        }
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .config-item {
+            margin-bottom: 10px;
+        }
+        .config-label {
+            font-weight: bold;
+        }
+        .config-value {
+            background: #f0f0f0;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-control {
+            padding: 10px;
+            width: 100%;
+        }
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+        .section { display: none; }
+        .section.active { display: block; }
 
-        const API_BASE_URL = 'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net';
-        const CONFIG_ENDPOINT = '/api/Admin';
-        const USERS_ENDPOINT = '/api/Usuarios';
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+        }
+        .notification.show { display: block; }
+        .notification.success { background-color: #2ecc71; color: white; }
+        .notification.error { background-color: #e74c3c; color: white; }
 
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 6px solid #ccc;
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Estilos adicionais para integração da edição */
+        .config-actions {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        .edit-mode .config-display {
+            display: none;
+        }
+        
+        .edit-mode .config-edit {
+            display: block;
+        }
+        
+        .config-edit {
+            display: none;
+        }
+        
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-cancel {
+            background: #95a5a6;
+            margin-right: 10px;
+        }
+
+        /* Estilo para o modal de confirmação */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-btn.confirm {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: #95a5a6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Loading -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="notification success" id="success-notification"><span id="success-message"></span></div>
+    <div class="notification error" id="error-notification"><span id="error-message"></span></div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal" id="logout-modal">
+        <div class="modal-content">
+            <h3>Confirmar Saída</h3>
+            <p>Tem certeza que deseja sair do sistema?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="logout-cancel">Cancelar</button>
+                <button class="modal-btn confirm" id="logout-confirm">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Admin</h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" data-target="config-section">Configurações</div>
+            <div class="menu-item" data-target="users-section">Usuários</div>
+            <div class="menu-item" id="logout-btn">Sair</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Painel Administrativo</h1>
+        </div>
+
+        <div class="section active" id="config-section">
+            <div class="card">
+                <div class="card-header">Configurações</div>
+                <div class="card-body">
+                    <div class="config-display">
+                        <div class="config-item">
+                            <div class="config-label">Valor Base:</div>
+                            <div class="config-value" id="config-valor-base">...</div>
+                        </div>
+                        <div class="config-item">
+                            <div class="config-label">Tipos de Parentesco:</div>
+                            <div class="config-value" id="config-parentescos">...</div>
+                        </div>
+                        
+                        <div class="config-actions">
+                            <button id="edit-config-btn" class="btn btn-edit">
+                                <i class="fas fa-edit"></i> Editar Configurações
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="config-edit">
+                        <form id="config-form">
+                            <input type="hidden" id="config-edit-id">
+                            <div class="form-group">
+                                <label for="valorBase">Valor Base Renda Per Capita</label>
+                                <input type="number" class="form-control" id="valorBase" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tiposParentesco">Tipos de Parentesco Permitidos</label>
+                                <textarea class="form-control" id="tiposParentesco" rows="4" required></textarea>
+                            </div>
+                            
+                            <div class="config-actions">
+                                <button type="button" id="cancel-edit-btn" class="btn btn-cancel">Cancelar</button>
+                                <button type="submit" class="btn btn-edit">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="users-section">
+            <div class="card">
+                <div class="card-header">Usuários</div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="users-table">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Email</th>
+                                <th>Tipo</th>
+                                <th>Parentes</th>
+                            </tr>
+                            </thead>
+                            <tbody>                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // URL da API corrigida
+    const API_BASE_URL = 'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net';
+    const CONFIG_ENDPOINT = '/api/Admin';
+    const USERS_ENDPOINT = '/api/Usuarios';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Verificar token
         const AUTH_TOKEN = localStorage.getItem("token");
+        if (!AUTH_TOKEN) {
+            alert('Token não encontrado. Redirecionando para login...');
+            window.location.href = 'index.html';
+            return;
+        }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (!AUTH_TOKEN) {
-                alert('Token não encontrado. Redirecionando para login...');
-                window.location.href = 'index.html';
-                return;
-            }
-
-
+        try {
+            // Referências aos elementos do DOM
             const loadingOverlay = document.getElementById('loading-overlay');
             const configValorBase = document.getElementById('config-valor-base');
             const configParentescos = document.getElementById('config-parentescos');
@@ -39,10 +351,9 @@
             const logoutCancel = document.getElementById('logout-cancel');
             const logoutConfirm = document.getElementById('logout-confirm');
 
+            // Funções auxiliares
             function showLoading(show) {
-                if (loadingOverlay) {
-                    loadingOverlay.style.display = show ? 'flex' : 'none';
-                }
+                if (loadingOverlay) loadingOverlay.style.display = show ? 'flex' : 'none';
             }
 
             function showNotification(type, message) {
@@ -58,19 +369,14 @@
             }
 
             function toggleEditMode(enable) {
-                if (enable) {
-                    configSection.classList.add('edit-mode');
-                } else {
-                    configSection.classList.remove('edit-mode');
-                }
+                configSection.classList.toggle('edit-mode', enable);
             }
 
             function showModal(show) {
-                if (logoutModal) {
-                    logoutModal.style.display = show ? 'flex' : 'none';
-                }
+                if (logoutModal) logoutModal.style.display = show ? 'flex' : 'none';
             }
 
+            // Carregar configurações
             async function fetchConfig() {
                 showLoading(true);
                 try {
@@ -80,6 +386,11 @@
                             'Accept': 'application/json'
                         }
                     });
+                    
+                    if (!res.ok) {
+                        throw new Error(`Erro HTTP: ${res.status}`);
+                    }
+                    
                     const json = await res.json();
                     if (json.success && json.data) {
                         if (configValorBase) configValorBase.textContent = `R$ ${json.data.valorBaseRendaPerCapita},00`;
@@ -91,23 +402,25 @@
                         throw new Error(json.message || 'Erro ao carregar configurações');
                     }
                 } catch (err) {
+                    console.error('Erro no fetchConfig:', err);
                     showNotification('error', err.message);
                 } finally {
                     showLoading(false);
                 }
             }
 
+            // Atualizar configurações
             async function updateConfig() {
                 showLoading(true);
                 try {
-                    const id = configEditId ? configEditId.value : null;
+                    const id = configEditId.value;
                     if (!id) throw new Error('ID de configuração não encontrado');
-
+                    
                     const data = {
                         valorBaseRendaPerCapita: parseInt(valorBaseInput.value),
                         tiposParentescoPermitidos: tiposParentescoInput.value
                     };
-
+                    
                     const res = await fetch(`${API_BASE_URL}${CONFIG_ENDPOINT}/${id}`, {
                         method: 'PUT',
                         headers: {
@@ -117,7 +430,11 @@
                         },
                         body: JSON.stringify(data)
                     });
-
+                    
+                    if (!res.ok) {
+                        throw new Error(`Erro HTTP: ${res.status}`);
+                    }
+                    
                     const json = await res.json();
                     if (json.success) {
                         showNotification('success', 'Configurações atualizadas!');
@@ -127,12 +444,14 @@
                         throw new Error(json.message || 'Erro ao atualizar configurações');
                     }
                 } catch (err) {
+                    console.error('Erro no updateConfig:', err);
                     showNotification('error', err.message);
                 } finally {
                     showLoading(false);
                 }
             }
 
+            // Carregar usuários
             async function fetchUsers() {
                 showLoading(true);
                 try {
@@ -141,39 +460,39 @@
                             'Authorization': `Bearer ${AUTH_TOKEN}`
                         }
                     });
+                    
+                    if (!res.ok) {
+                        throw new Error(`Erro HTTP: ${res.status}`);
+                    }
+                    
                     const json = await res.json();
-
-
-                    if (!usersTable) {
-                        console.error('Tabela de usuários não encontrada!');
-                        return;
+                    
+                    if (usersTable) {
+                        const tbody = usersTable.querySelector('tbody');
+                        if (tbody) {
+                            tbody.innerHTML = '';
+                            json.data.forEach(user => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${user.id}</td>
+                                    <td>${user.nome}</td>
+                                    <td>${user.cpf}</td>
+                                    <td>${user.email}</td>
+                                    <td>${user.isAdmin ? 'Admin' : 'Usuário'}</td>
+                                    <td>${user.parentes?.length || 0}</td>`;
+                                tbody.appendChild(row);
+                            });
+                        }
                     }
-
-                    const tbody = usersTable.querySelector('tbody');
-                    if (!tbody) {
-                        console.error('Corpo da tabela não encontrado!');
-                        return;
-                    }
-
-                    tbody.innerHTML = '';
-                    json.data.forEach(user => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                    <td>${user.id}</td>
-                    <td>${user.nome}</td>
-                    <td>${user.cpf}</td>
-                    <td>${user.email}</td>
-                    <td>${user.isAdmin ? 'Admin' : 'Usuário'}</td>
-                    <td>${user.parentes?.length || 0}</td>`;
-                        tbody.appendChild(row);
-                    });
                 } catch (err) {
+                    console.error('Erro no fetchUsers:', err);
                     showNotification('error', err.message);
                 } finally {
                     showLoading(false);
                 }
             }
 
+            // Event Listeners
             document.querySelectorAll('.menu-item').forEach(item => {
                 if (item.id !== 'logout-btn') {
                     item.addEventListener('click', () => {
@@ -197,9 +516,7 @@
             }
 
             if (editConfigBtn) {
-                editConfigBtn.addEventListener('click', () => {
-                    toggleEditMode(true);
-                });
+                editConfigBtn.addEventListener('click', () => toggleEditMode(true));
             }
 
             if (cancelEditBtn) {
@@ -210,15 +527,11 @@
             }
 
             if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    showModal(true);
-                });
+                logoutBtn.addEventListener('click', () => showModal(true));
             }
 
             if (logoutCancel) {
-                logoutCancel.addEventListener('click', () => {
-                    showModal(false);
-                });
+                logoutCancel.addEventListener('click', () => showModal(false));
             }
 
             if (logoutConfirm) {
@@ -230,126 +543,19 @@
 
             if (logoutModal) {
                 logoutModal.addEventListener('click', (e) => {
-                    if (e.target === logoutModal) {
-                        showModal(false);
-                    }
+                    if (e.target === logoutModal) showModal(false);
                 });
             }
 
+            // Carregar dados iniciais
             await fetchConfig();
             await fetchUsers();
-        });
-    </script>
-</head>
 
-<body>
-    <div class="container">
-        <!-- Loading -->
-        <div class="loading-overlay" id="loading-overlay">
-            <div class="spinner"></div>
-        </div>
-
-        <!-- Notifications -->
-        <div class="notification success" id="success-notification"><span id="success-message"></span></div>
-        <div class="notification error" id="error-notification"><span id="error-message"></span></div>
-
-        <!-- Modal de Confirmação -->
-        <div class="modal" id="logout-modal">
-            <div class="modal-content">
-                <h3>Confirmar Saída</h3>
-                <p>Tem certeza que deseja sair do sistema?</p>
-                <div class="modal-buttons">
-                    <button class="modal-btn cancel" id="logout-cancel">Cancelar</button>
-                    <button class="modal-btn confirm" id="logout-confirm">Sair</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>Admin</h2>
-            </div>
-            <div class="sidebar-menu">
-                <div class="menu-item active" data-target="config-section">Configurações</div>
-                <div class="menu-item" data-target="users-section">Usuários</div>
-                <div class="menu-item" id="logout-btn">Sair</div>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <div class="header">
-                <h1>Painel Administrativo</h1>
-            </div>
-
-            <div class="section active" id="config-section">
-                <div class="card">
-                    <div class="card-header">Configurações</div>
-                    <div class="card-body">
-                        <div class="config-display">
-                            <div class="config-item">
-                                <div class="config-label">Valor Base:</div>
-                                <div class="config-value" id="config-valor-base">...</div>
-                            </div>
-                            <div class="config-item">
-                                <div class="config-label">Tipos de Parentesco:</div>
-                                <div class="config-value" id="config-parentescos">...</div>
-                            </div>
-
-                            <div class="config-actions">
-                                <button id="edit-config-btn" class="btn btn-edit">
-                                    <i class="fas fa-edit"></i> Editar Configurações
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="config-edit">
-                            <form id="config-form">
-                                <input type="hidden" id="config-edit-id">
-                                <div class="form-group">
-                                    <label for="valorBase">Valor Base Renda Per Capita</label>
-                                    <input type="number" class="form-control" id="valorBase" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="tiposParentesco">Tipos de Parentesco Permitidos</label>
-                                    <textarea class="form-control" id="tiposParentesco" rows="4" required></textarea>
-                                </div>
-
-                                <div class="config-actions">
-                                    <button type="button" id="cancel-edit-btn" class="btn btn-cancel">Cancelar</button>
-                                    <button type="submit" class="btn btn-edit">Salvar Alterações</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" id="users-section">
-                <div class="card">
-                    <div class="card-header">Usuários</div>
-                    <div class="card-body">
-                        <div class="table-container">
-                            <table id="users-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nome</th>
-                                        <th>CPF</th>
-                                        <th>Email</th>
-                                        <th>Tipo</th>
-                                        <th>Parentes</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        } catch (error) {
+            console.error('Erro na inicialização:', error);
+            showNotification('error', `Erro fatal: ${error.message}`);
+        }
+    });
+</script>
 </body>
-
 </html>
