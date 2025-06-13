@@ -1,120 +1,355 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Administrativo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/admin-style.css">
-    <script src="js/admin.js"></script>
+    <script>
+
+        const API_BASE_URL = 'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net';
+        const CONFIG_ENDPOINT = '/api/Admin';
+        const USERS_ENDPOINT = '/api/Usuarios';
+
+        const AUTH_TOKEN = localStorage.getItem("token");
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!AUTH_TOKEN) {
+                alert('Token não encontrado. Redirecionando para login...');
+                window.location.href = 'index.html';
+                return;
+            }
+
+
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const configValorBase = document.getElementById('config-valor-base');
+            const configParentescos = document.getElementById('config-parentescos');
+            const valorBaseInput = document.getElementById('valorBase');
+            const tiposParentescoInput = document.getElementById('tiposParentesco');
+            const configForm = document.getElementById('config-form');
+            const usersTable = document.getElementById('users-table');
+            const configEditId = document.getElementById('config-edit-id');
+            const editConfigBtn = document.getElementById('edit-config-btn');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+            const configSection = document.getElementById('config-section');
+            const logoutBtn = document.getElementById('logout-btn');
+            const logoutModal = document.getElementById('logout-modal');
+            const logoutCancel = document.getElementById('logout-cancel');
+            const logoutConfirm = document.getElementById('logout-confirm');
+
+            function showLoading(show) {
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = show ? 'flex' : 'none';
+                }
+            }
+
+            function showNotification(type, message) {
+                const el = document.getElementById(`${type}-notification`);
+                const msg = document.getElementById(`${type}-message`);
+                if (el && msg) {
+                    msg.textContent = message;
+                    el.classList.add('show');
+                    setTimeout(() => el.classList.remove('show'), 3000);
+                } else {
+                    alert(message);
+                }
+            }
+
+            function toggleEditMode(enable) {
+                if (enable) {
+                    configSection.classList.add('edit-mode');
+                } else {
+                    configSection.classList.remove('edit-mode');
+                }
+            }
+
+            function showModal(show) {
+                if (logoutModal) {
+                    logoutModal.style.display = show ? 'flex' : 'none';
+                }
+            }
+
+            async function fetchConfig() {
+                showLoading(true);
+                try {
+                    const res = await fetch(`${API_BASE_URL}${CONFIG_ENDPOINT}`, {
+                        headers: {
+                            'Authorization': `Bearer ${AUTH_TOKEN}`,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const json = await res.json();
+                    if (json.success && json.data) {
+                        if (configValorBase) configValorBase.textContent = `R$ ${json.data.valorBaseRendaPerCapita},00`;
+                        if (configParentescos) configParentescos.textContent = json.data.tiposParentescoPermitidos;
+                        if (valorBaseInput) valorBaseInput.value = json.data.valorBaseRendaPerCapita;
+                        if (tiposParentescoInput) tiposParentescoInput.value = json.data.tiposParentescoPermitidos;
+                        if (configEditId) configEditId.value = json.data.id;
+                    } else {
+                        throw new Error(json.message || 'Erro ao carregar configurações');
+                    }
+                } catch (err) {
+                    showNotification('error', err.message);
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            async function updateConfig() {
+                showLoading(true);
+                try {
+                    const id = configEditId ? configEditId.value : null;
+                    if (!id) throw new Error('ID de configuração não encontrado');
+
+                    const data = {
+                        valorBaseRendaPerCapita: parseInt(valorBaseInput.value),
+                        tiposParentescoPermitidos: tiposParentescoInput.value
+                    };
+
+                    const res = await fetch(`${API_BASE_URL}${CONFIG_ENDPOINT}/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${AUTH_TOKEN}`,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const json = await res.json();
+                    if (json.success) {
+                        showNotification('success', 'Configurações atualizadas!');
+                        await fetchConfig();
+                        toggleEditMode(false);
+                    } else {
+                        throw new Error(json.message || 'Erro ao atualizar configurações');
+                    }
+                } catch (err) {
+                    showNotification('error', err.message);
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            async function fetchUsers() {
+                showLoading(true);
+                try {
+                    const res = await fetch(`${API_BASE_URL}${USERS_ENDPOINT}`, {
+                        headers: {
+                            'Authorization': `Bearer ${AUTH_TOKEN}`
+                        }
+                    });
+                    const json = await res.json();
+
+
+                    if (!usersTable) {
+                        console.error('Tabela de usuários não encontrada!');
+                        return;
+                    }
+
+                    const tbody = usersTable.querySelector('tbody');
+                    if (!tbody) {
+                        console.error('Corpo da tabela não encontrado!');
+                        return;
+                    }
+
+                    tbody.innerHTML = '';
+                    json.data.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.nome}</td>
+                    <td>${user.cpf}</td>
+                    <td>${user.email}</td>
+                    <td>${user.isAdmin ? 'Admin' : 'Usuário'}</td>
+                    <td>${user.parentes?.length || 0}</td>`;
+                        tbody.appendChild(row);
+                    });
+                } catch (err) {
+                    showNotification('error', err.message);
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            document.querySelectorAll('.menu-item').forEach(item => {
+                if (item.id !== 'logout-btn') {
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        const target = item.getAttribute('data-target');
+                        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+                        if (target) {
+                            const section = document.getElementById(target);
+                            if (section) section.classList.add('active');
+                        }
+                    });
+                }
+            });
+
+            if (configForm) {
+                configForm.addEventListener('submit', e => {
+                    e.preventDefault();
+                    updateConfig();
+                });
+            }
+
+            if (editConfigBtn) {
+                editConfigBtn.addEventListener('click', () => {
+                    toggleEditMode(true);
+                });
+            }
+
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', () => {
+                    toggleEditMode(false);
+                    fetchConfig();
+                });
+            }
+
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    showModal(true);
+                });
+            }
+
+            if (logoutCancel) {
+                logoutCancel.addEventListener('click', () => {
+                    showModal(false);
+                });
+            }
+
+            if (logoutConfirm) {
+                logoutConfirm.addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                });
+            }
+
+            if (logoutModal) {
+                logoutModal.addEventListener('click', (e) => {
+                    if (e.target === logoutModal) {
+                        showModal(false);
+                    }
+                });
+            }
+
+            await fetchConfig();
+            await fetchUsers();
+        });
+    </script>
 </head>
+
 <body>
-<div class="container">
-    <!-- Loading -->
-    <div class="loading-overlay" id="loading-overlay">
-        <div class="spinner"></div>
-    </div>
+    <div class="container">
+        <!-- Loading -->
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="spinner"></div>
+        </div>
 
-    <!-- Notifications -->
-    <div class="notification success" id="success-notification"><span id="success-message"></span></div>
-    <div class="notification error" id="error-notification"><span id="error-message"></span></div>
+        <!-- Notifications -->
+        <div class="notification success" id="success-notification"><span id="success-message"></span></div>
+        <div class="notification error" id="error-notification"><span id="error-message"></span></div>
 
-    <!-- Modal de Confirmação -->
-    <div class="modal" id="logout-modal">
-        <div class="modal-content">
-            <h3>Confirmar Saída</h3>
-            <p>Tem certeza que deseja sair do sistema?</p>
-            <div class="modal-buttons">
-                <button class="modal-btn cancel" id="logout-cancel">Cancelar</button>
-                <button class="modal-btn confirm" id="logout-confirm">Sair</button>
+        <!-- Modal de Confirmação -->
+        <div class="modal" id="logout-modal">
+            <div class="modal-content">
+                <h3>Confirmar Saída</h3>
+                <p>Tem certeza que deseja sair do sistema?</p>
+                <div class="modal-buttons">
+                    <button class="modal-btn cancel" id="logout-cancel">Cancelar</button>
+                    <button class="modal-btn confirm" id="logout-confirm">Sair</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>Admin</h2>
-        </div>
-        <div class="sidebar-menu">
-            <div class="menu-item active" data-target="config-section">Configurações</div>
-            <div class="menu-item" data-target="users-section">Usuários</div>
-            <div class="menu-item" id="logout-btn">Sair</div>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <div class="header">
-            <h1>Painel Administrativo</h1>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin</h2>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-target="config-section">Configurações</div>
+                <div class="menu-item" data-target="users-section">Usuários</div>
+                <div class="menu-item" id="logout-btn">Sair</div>
+            </div>
         </div>
 
-        <div class="section active" id="config-section">
-            <div class="card">
-                <div class="card-header">Configurações</div>
-                <div class="card-body">
-                    <div class="config-display">
-                        <div class="config-item">
-                            <div class="config-label">Valor Base:</div>
-                            <div class="config-value" id="config-valor-base">...</div>
-                        </div>
-                        <div class="config-item">
-                            <div class="config-label">Tipos de Parentesco:</div>
-                            <div class="config-value" id="config-parentescos">...</div>
-                        </div>
-                        
-                        <div class="config-actions">
-                            <button id="edit-config-btn" class="btn btn-edit">
-                                <i class="fas fa-edit"></i> Editar Configurações
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="config-edit">
-                        <form id="config-form">
-                            <input type="hidden" id="config-edit-id">
-                            <div class="form-group">
-                                <label for="valorBase">Valor Base Renda Per Capita</label>
-                                <input type="number" class="form-control" id="valorBase" required>
+        <div class="main-content">
+            <div class="header">
+                <h1>Painel Administrativo</h1>
+            </div>
+
+            <div class="section active" id="config-section">
+                <div class="card">
+                    <div class="card-header">Configurações</div>
+                    <div class="card-body">
+                        <div class="config-display">
+                            <div class="config-item">
+                                <div class="config-label">Valor Base:</div>
+                                <div class="config-value" id="config-valor-base">...</div>
                             </div>
-                            <div class="form-group">
-                                <label for="tiposParentesco">Tipos de Parentesco Permitidos</label>
-                                <textarea class="form-control" id="tiposParentesco" rows="4" required></textarea>
+                            <div class="config-item">
+                                <div class="config-label">Tipos de Parentesco:</div>
+                                <div class="config-value" id="config-parentescos">...</div>
                             </div>
-                            
+
                             <div class="config-actions">
-                                <button type="button" id="cancel-edit-btn" class="btn btn-cancel">Cancelar</button>
-                                <button type="submit" class="btn btn-edit">Salvar Alterações</button>
+                                <button id="edit-config-btn" class="btn btn-edit">
+                                    <i class="fas fa-edit"></i> Editar Configurações
+                                </button>
                             </div>
-                        </form>
+                        </div>
+
+                        <div class="config-edit">
+                            <form id="config-form">
+                                <input type="hidden" id="config-edit-id">
+                                <div class="form-group">
+                                    <label for="valorBase">Valor Base Renda Per Capita</label>
+                                    <input type="number" class="form-control" id="valorBase" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tiposParentesco">Tipos de Parentesco Permitidos</label>
+                                    <textarea class="form-control" id="tiposParentesco" rows="4" required></textarea>
+                                </div>
+
+                                <div class="config-actions">
+                                    <button type="button" id="cancel-edit-btn" class="btn btn-cancel">Cancelar</button>
+                                    <button type="submit" class="btn btn-edit">Salvar Alterações</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="section" id="users-section">
-            <div class="card">
-                <div class="card-header">Usuários</div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table id="users-table">
-                            <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>CPF</th>
-                                <th>Email</th>
-                                <th>Tipo</th>
-                                <th>Parentes</th>
-                            </tr>
-                            </thead>
-                            <tbody>                            
-                            </tbody>
-                        </table>
+            <div class="section" id="users-section">
+                <div class="card">
+                    <div class="card-header">Usuários</div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome</th>
+                                        <th>CPF</th>
+                                        <th>Email</th>
+                                        <th>Tipo</th>
+                                        <th>Parentes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>
