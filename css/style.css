@@ -50,7 +50,7 @@ p {
 /* ==== INPUTS E LABELS ==== */
 input, select {
   padding: 0.75rem;
-  border: 1px solid #ccc;
+  border: 1px solid #ccccccea;
   border-radius: 5px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
