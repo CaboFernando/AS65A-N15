@@ -43,8 +43,12 @@ document.getElementById("login-form").addEventListener("submit", function(e) {
         localStorage.setItem("idUsuario", data.idUsuario); // Armazena o ID do usuário
 
         console.log("ID do usuário salvo:", data.idUsuario);
-
-        window.location.href = "home.html"; 
+        
+        if (data.isAdm === true) {
+            window.location.href = "admin.html";
+        } else {
+            window.location.href = "home.html";
+        }
     })
     .catch(err => {
         alert(err.message || "Erro ao conectar com o servidor.");

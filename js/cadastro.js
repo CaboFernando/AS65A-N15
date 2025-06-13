@@ -46,23 +46,23 @@ document.getElementById("cadastro-form").addEventListener("submit", function (e)
             senha: senha
         })
     })
-<<<<.then(res => {
-    if (res.ok) {
-        return res.json(); // Trata a resposta como JSON
-    } else {
-        throw new Error("Erro ao cadastrar. Verifique os dados e tente novamente.");
-    }
-})
-.then(data => {
-    if (data.Success) {
-        alert("Cadastro realizado com sucesso!");
-        window.location.href = "index.html"; // Redireciona para a página de login
-    } else {
-        alert("Erro ao cadastrar. Verifique os dados e tente novamente.");
-    }
-})
-.catch(err => {
-    console.error("Erro ao conectar com o servidor:", err);
-    alert(err.message || "Erro ao conectar com o servidor.");
+        .then(res => {
+            if (res.ok) {
+                return res.json(); // Trata a resposta como JSON
+            } else {
+                throw new Error("Erro ao cadastrar. Verifique os dados e tente novamente.");
+            }
+        })
+        .then(data => {
+            if (data.Success) {
+                alert("Cadastro realizado com sucesso!");
+                window.location.href = "index.html"; // Redireciona para a página de login
+            } else {
+                alert("Erro ao cadastrar. Verifique os dados e tente novamente.");
+            }
+        })
+        .catch(err => {
+            console.error("Erro ao conectar com o servidor:", err);
+            alert(err.message || "Erro ao conectar com o servidor.");
+        });
 });
-
