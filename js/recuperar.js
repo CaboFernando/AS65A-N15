@@ -1,32 +1,36 @@
-document.getElementById("recuperar-form").addEventListener("submit", function(e) {
-    e.preventDefault();
+document.getElementById("recuperarForm").addEventListener("submit", async function (event) {
+  event.preventDefault();
 
-    const email = document.getElementById("email").value.trim();
+  const cpf = document.getElementById("cpf").value;
+  const email = document.getElementById("email").value;
+  const novaSenha = document.getElementById("novaSenha").value;
 
-    if (!email) {
-        alert("Digite seu e-mail cadastrado.");
-        return;
-    }
+  const payload = {
+    cpf: cpf,
+    email: email,
+    novaSenha: novaSenha
+  };
 
-    fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Auths/forgot-password', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email })
-    })
-    .then(res => {
-        if (res.ok) {
-            return res.json();
-        } else {
-            throw new Error("Não foi possível enviar o e-mail.");
-        }
-    })
-    .then(data => {
-        alert("Um link de redefinição foi enviado para seu e-mail.");
-        window.location.href = "login.html";
-    })
-    .catch(err => {
-        alert(err.message || "Erro ao conectar com o servidor.");
+  try {
+    const resposta = await fetch("https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Usuarios/AlterarSenha", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
     });
+
+    const mensagem = document.getElementById("mensagem");
+
+    if (resposta.ok) {
+      mensagem.textContent = "Senha alterada com sucesso!";
+      mensagem.style.color = "green";
+    } else {
+      mensagem.textContent = "Não foi possível alterar a senha. Verifique o CPF e e-mail.";
+      mensagem.style.color = "red";
+    }
+  } catch (erro) {
+    console.error("Erro ao enviar requisição:", erro);
+    document.getElementById("mensagem").textContent = "Erro ao tentar alterar a senha.";
+  }
 });
