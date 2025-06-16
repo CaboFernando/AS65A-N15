@@ -29,35 +29,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    function preencherFormularioComDadosLocais() {
-        const userName = localStorage.getItem('userName');
-        const userCpf = localStorage.getItem('userCpf');
-        const userEmail = localStorage.getItem('userEmail');
+    async function carregarDadosDoUsuario() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/Usuarios/${idUsuario}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
 
-        if (userName) {
-            editNome.value = userName;
-        }
-        if (userCpf) {
-            editCpf.value = userCpf.replace(/\D/g, ''); 
-        }
-        if (userEmail) {
-            editEmail.value = userEmail;
+            if (response.ok) {
+                const result = await response.json();
+                const user = result.data;
+
+                editNome.value = user.nome || '';
+                editCpf.value = user.cpf || '';
+                editEmail.value = user.email || '';
+
+                localStorage.setItem('userName', user.nome);
+                localStorage.setItem('userCpf', user.cpf);
+                localStorage.setItem('userEmail', user.email);
+            } else if (response.status === 401 || response.status === 403) {
+                alert('Sessão expirada. Faça login novamente.');
+                logout();
+            } else {
+                alert('Erro ao buscar dados do usuário: ' + response.statusText);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar dados do usuário:', error);
+            alert('Erro de rede ao carregar os dados. Verifique sua conexão.');
         }
     }
 
-    preencherFormularioComDadosLocais();
+    await carregarDadosDoUsuario();
 
     perfilForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         const nome = editNome.value.trim();
-        let cpf = editCpf.value.trim(); 
+        let cpf = editCpf.value.trim();
         const email = editEmail.value.trim();
         const senha = editSenha.value; // Pega o valor do campo de senha (pode ser vazio)
 
         cpf = cpf.replace(/\D/g, ''); // Limpa o CPF para enviar somente números
 
-        console.log('CPF sendo enviado para a API (limpo):', cpf); 
+        console.log('CPF sendo enviado para a API (limpo):', cpf);
         console.log('Payload completo sendo enviado:', { nome, cpf, email, Senha: senha ? '******' : '[Campo Vazio]' }); // Log para a senha
 
 
@@ -89,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (result.Success) { // Sua API pode retornar 'Success' ou 'success'
                     alert(result.Message || 'Perfil atualizado com sucesso!');
                     localStorage.setItem('userName', nome);
-                    localStorage.setItem('userCpf', cpf); 
+                    localStorage.setItem('userCpf', cpf);
                     localStorage.setItem('userEmail', email);
                     window.location.href = 'home.html';
                 } else {
