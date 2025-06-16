@@ -88,8 +88,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             Nome: nome,   // ALTERAÇÃO AQUI: Nome com 'N' maiúsculo (pode ser necessário)
             Cpf: cpf,     // ALTERAÇÃO AQUI: Cpf com 'C' maiúsculo (já tinha sido sugerido, mas reforçando)
             Email: email, // ALTERAÇÃO AQUI: Email com 'E' maiúsculo (pode ser necessário)
-            Senha: senha  // ALTERAÇÃO AQUI: Senha com 'S' maiúsculo, SEM a condição (sempre envia, mesmo que vazio)
         };
+
+        if (senha.trim()) {
+            usuarioUpdateDto.Senha = senha;
+        }
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/Usuarios/${idUsuario}`, {
