@@ -1,17 +1,16 @@
+
 const API_BASE_URL = 'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net';
 const CONFIG_ENDPOINT = '/api/Admin';
 const USERS_ENDPOINT = '/api/Usuarios';
 
-const AUTH_TOKEN = localStorage.getItem("token");
-
 document.addEventListener('DOMContentLoaded', async () => {
+    const AUTH_TOKEN = localStorage.getItem("token");
     if (!AUTH_TOKEN) {
         alert('Token não encontrado. Redirecionando para login...');
         window.location.href = 'index.html';
         return;
     }
 
-    
     const loadingOverlay = document.getElementById('loading-overlay');
     const configValorBase = document.getElementById('config-valor-base');
     const configParentescos = document.getElementById('config-parentescos');
@@ -29,9 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const logoutConfirm = document.getElementById('logout-confirm');
 
     function showLoading(show) {
-        if (loadingOverlay) {
-            loadingOverlay.style.display = show ? 'flex' : 'none';
-        }
+        if (loadingOverlay) loadingOverlay.style.display = show ? 'flex' : 'none';
     }
 
     function showNotification(type, message) {
@@ -47,17 +44,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function toggleEditMode(enable) {
-        if (enable) {
-            configSection.classList.add('edit-mode');
-        } else {
-            configSection.classList.remove('edit-mode');
-        }
+        configSection.classList.toggle('edit-mode', enable);
     }
 
     function showModal(show) {
-        if (logoutModal) {
-            logoutModal.style.display = show ? 'flex' : 'none';
-        }
+        if (logoutModal) logoutModal.style.display = show ? 'flex' : 'none';
     }
 
     async function fetchConfig() {
@@ -69,17 +60,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'Accept': 'application/json'
                 }
             });
+
+            if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+
             const json = await res.json();
             if (json.success && json.data) {
-                if (configValorBase) configValorBase.textContent = `R$ ${json.data.valorBaseRendaPerCapita},00`;
-                if (configParentescos) configParentescos.textContent = json.data.tiposParentescoPermitidos;
-                if (valorBaseInput) valorBaseInput.value = json.data.valorBaseRendaPerCapita;
-                if (tiposParentescoInput) tiposParentescoInput.value = json.data.tiposParentescoPermitidos;
-                if (configEditId) configEditId.value = json.data.id;
+                configValorBase.textContent = `R$ ${json.data.valorBaseRendaPerCapita},00`;
+                configParentescos.textContent = json.data.tiposParentescoPermitidos;
+                valorBaseInput.value = json.data.valorBaseRendaPerCapita;
+                tiposParentescoInput.value = json.data.tiposParentescoPermitidos;
+                configEditId.value = json.data.id;
             } else {
                 throw new Error(json.message || 'Erro ao carregar configurações');
             }
         } catch (err) {
+            console.error('Erro no fetchConfig:', err);
             showNotification('error', err.message);
         } finally {
             showLoading(false);
@@ -89,14 +84,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function updateConfig() {
         showLoading(true);
         try {
-            const id = configEditId ? configEditId.value : null;
+            const id = configEditId.value;
             if (!id) throw new Error('ID de configuração não encontrado');
-            
+
             const data = {
                 valorBaseRendaPerCapita: parseInt(valorBaseInput.value),
                 tiposParentescoPermitidos: tiposParentescoInput.value
             };
-            
+
             const res = await fetch(`${API_BASE_URL}${CONFIG_ENDPOINT}/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -106,16 +101,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
                 body: JSON.stringify(data)
             });
-            
+
+            if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+
             const json = await res.json();
             if (json.success) {
                 showNotification('success', 'Configurações atualizadas!');
                 await fetchConfig();
-                toggleEditMode(false); 
+                toggleEditMode(false);
             } else {
                 throw new Error(json.message || 'Erro ao atualizar configurações');
             }
         } catch (err) {
+            console.error('Erro no updateConfig:', err);
             showNotification('error', err.message);
         } finally {
             showLoading(false);
@@ -130,20 +128,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'Authorization': `Bearer ${AUTH_TOKEN}`
                 }
             });
+
+            if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+
             const json = await res.json();
-            
-            
-            if (!usersTable) {
-                console.error('Tabela de usuários não encontrada!');
-                return;
-            }
-            
+
             const tbody = usersTable.querySelector('tbody');
-            if (!tbody) {
-                console.error('Corpo da tabela não encontrado!');
-                return;
-            }
-            
             tbody.innerHTML = '';
             json.data.forEach(user => {
                 const row = document.createElement('tr');
@@ -157,12 +147,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tbody.appendChild(row);
             });
         } catch (err) {
+            console.error('Erro no fetchUsers:', err);
             showNotification('error', err.message);
         } finally {
             showLoading(false);
         }
     }
-    
+
     document.querySelectorAll('.menu-item').forEach(item => {
         if (item.id !== 'logout-btn') {
             item.addEventListener('click', () => {
@@ -177,54 +168,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
     });
-    
-    if (configForm) {
-        configForm.addEventListener('submit', e => {
-            e.preventDefault();
-            updateConfig();
-        });
-    }
-    
-    if (editConfigBtn) {
-        editConfigBtn.addEventListener('click', () => {
-            toggleEditMode(true);
-        });
-    }
-    
-    if (cancelEditBtn) {
-        cancelEditBtn.addEventListener('click', () => {
-            toggleEditMode(false);
-            fetchConfig(); 
-        });
-    }
-    
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            showModal(true);
-        });
-    }
-    
-    if (logoutCancel) {
-        logoutCancel.addEventListener('click', () => {
-            showModal(false);
-        });
-    }
-    
-    if (logoutConfirm) {
-        logoutConfirm.addEventListener('click', () => {
-            localStorage.removeItem('token');
-            window.location.href = 'index.html';
-        });
-    }
-    
-    if (logoutModal) {
-        logoutModal.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                showModal(false);
-            }
-        });
-    }
-    
+
+    configForm?.addEventListener('submit', e => {
+        e.preventDefault();
+        updateConfig();
+    });
+
+    editConfigBtn?.addEventListener('click', () => toggleEditMode(true));
+
+    cancelEditBtn?.addEventListener('click', () => {
+        toggleEditMode(false);
+        fetchConfig();
+    });
+
+    logoutBtn?.addEventListener('click', () => showModal(true));
+
+    logoutCancel?.addEventListener('click', () => showModal(false));
+
+    logoutConfirm?.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+    });
+
+    logoutModal?.addEventListener('click', e => {
+        if (e.target === logoutModal) showModal(false);
+    });
+
     await fetchConfig();
     await fetchUsers();
 });
