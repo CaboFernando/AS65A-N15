@@ -1,6 +1,32 @@
 const form = document.getElementById("familia-form");
 const lista = document.getElementById("lista-membros");
 const resultado = document.getElementById("resultado-renda");
+const API_BASE_URL = 'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const nomeUsuarioSpan = document.getElementById('nome-usuario');
+    const btnEditarPerfil = document.getElementById('btn-editar-perfil');
+    const btnConcluir = document.getElementById('btn-concluir');
+    const familiaForm = document.getElementById('familia-form');
+    const listaMembros = document.getElementById('lista-membros');
+    const resultadoRenda = document.getElementById('resultado-renda');
+
+    // Tentar carregar o nome do usuário do localStorage
+    const userName = localStorage.getItem('userName');
+    if (userName) {
+        nomeUsuarioSpan.textContent = userName;
+    } else {
+        nomeUsuarioSpan.textContent = 'Visitante'; // Fallback se não encontrar o nome
+        // Opcional: esconder a seção de perfil ou redirecionar se não estiver logado
+        // document.getElementById('perfil-logado').style.display = 'none';
+    }
+
+    if (btnEditarPerfil) {
+        btnEditarPerfil.addEventListener('click', () => {
+            window.location.href = 'editar-perfil.html';
+        });
+    } 
+});
 
 let membros = [];
 
@@ -161,5 +187,7 @@ document.getElementById("btn-concluir").addEventListener("click", async () => {
 
 function logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
     window.location.href = "index.html"; // Redireciona para a página de login
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Perfil</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="imagem-home">
+        <h1>Editar Meus Dados</h1>
+    </header>
+
+    <main>
+        <section class="cadastro-section">
+            <h2>Atualizar Informações do Perfil</h2>
+            <form id="perfil-form" class="cadastro-form">
+                <label for="editNome">Nome:</label>
+                <input type="text" id="editNome" placeholder="Nome completo" required>
+
+                <label for="editCpf">CPF:</label>
+                <input type="text" id="editCpf" placeholder="CPF (somente números)" required readonly>
+
+                <label for="editEmail">Email:</label>
+                <input type="email" id="editEmail" placeholder="Email válido" required>
+
+                <label for="editSenha">Nova Senha (deixe em branco para não alterar):</label>
+                <input type="password" id="editSenha" placeholder="Nova senha">
+
+                <button type="submit">Atualizar Perfil</button>
+            </form>
+        </section>
+        <section style="text-align: center; margin-top: 20px;">
+            <button onclick="window.location.href='home.html'">Voltar para a Home</button>
+        </section>
+    </main>
+
+    <script src="js/editar-perfil.js"></script>
+</body>
+</html>
