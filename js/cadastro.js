@@ -34,35 +34,34 @@ document.getElementById("cadastro-form").addEventListener("submit", function (e)
     }
 
     // Envio da requisição para a API de cadastro
-    fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Usuarios', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            nome: nome,
-            cpf: cpf,
-            email: email,
-            senha: senha
-        })
+   fetch('https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Usuarios', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        nome: nome,
+        cpf: cpf,
+        email: email,
+        senha: senha
     })
-        .then(res => {
-            if (res.ok) {
-                return res.json(); // Trata a resposta como JSON
-            } else {
-                throw new Error("Erro ao cadastrar. Verifique os dados e tente novamente.");
-            }
-        })
-        .then(data => {
-            if (data.Success) {
-                alert("Cadastro realizado com sucesso!");
-                window.location.href = "index.html"; // Redireciona para a página de login
-            } else {
-                alert("Erro ao cadastrar. Verifique os dados e tente novamente.");
-            }
-        })
-        .catch(err => {
-            console.error("Erro ao conectar com o servidor:", err);
-            alert(err.message || "Erro ao conectar com o servidor.");
+})
+.then(res => {
+    if (!res.ok) {
+        return res.text().then(textoErro => {
+            console.error("Detalhes do erro:", textoErro);
+            throw new Error(`Erro ${res.status}: ${textoErro}`);
         });
+    }
+    return res.json();
+})
+.then(data => {
+    alert("Cadastro realizado com sucesso!");
+    window.location.href = "index.html";
+})
+.catch(err => {
+    console.error("Erro ao conectar com o servidor:", err.message);
+    alert(err.message || "Erro ao conectar com o servidor.");
+});
+
 });
