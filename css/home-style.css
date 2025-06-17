@@ -1,0 +1,267 @@
+ /* ==== RESET E BASE ==== */
+ * {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+ }
+
+ body {
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+     background: #FFF8DC;
+     color: #363636;
+     line-height: 1.6;
+ }
+
+ /* ==== HEADER ==== */
+ header {
+     text-align: center;
+     padding: 20px 0;
+     background: #0066cc;
+     color: white;
+     position: relative;
+ }
+
+ .logo-container {
+     margin: 0 auto;
+     max-width: 300px;
+ }
+
+ #Logo {
+     width: 100%;
+     height: auto;
+     display: block;
+     object-fit: cover;
+     border-radius: 10%;
+ }
+
+ .perfil-usuario {
+     position: absolute;
+     top: 20px;
+     right: 20px;
+     background: rgba(255, 255, 255, 0.2);
+     padding: 10px 15px;
+     border-radius: 30px;
+     display: flex;
+     align-items: center;
+     gap: 10px;
+ }
+
+ .perfil-usuario button {
+     background: #004999;
+     color: white;
+     border: none;
+     padding: 5px 10px;
+     border-radius: 5px;
+     cursor: pointer;
+     font-size: 0.9rem;
+     transition: background-color 0.3s;
+ }
+
+ .perfil-usuario button:hover {
+     background: #003366;
+ }
+
+ /* ==== CONTENT SECTION ==== */
+ .content-section {
+     max-width: 1200px;
+     margin: 20px auto;
+     padding: 2rem;
+     background: white;
+     border-radius: 10px;
+     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+ }
+
+ .form-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+     gap: 20px;
+     margin-bottom: 20px;
+ }
+
+ .form-group {
+     margin-bottom: 1.5rem;
+ }
+
+ .form-group label {
+     display: block;
+     margin-bottom: 0.5rem;
+     font-weight: bold;
+     font-size: 0.95rem;
+     color: #444;
+ }
+
+ .campo-input {
+     width: 100%;
+     padding: 0.75rem;
+     border: 1px solid #ccc;
+     border-radius: 5px;
+     font-size: 1rem;
+     transition: border-color 0.3s ease;
+ }
+
+ .campo-input:focus {
+     border-color: #0066cc;
+     outline: none;
+ }
+
+ .button-group {
+     display: flex;
+     flex-wrap: wrap;
+     gap: 1rem;
+     margin-top: 20px;
+ }
+
+ .button-group button {
+     flex: 1 1 200px;
+     padding: 0.75rem;
+     background-color: #0066cc;
+     color: white;
+     font-size: 1rem;
+     font-weight: bold;
+     border: none;
+     border-radius: 5px;
+     cursor: pointer;
+     transition: background-color 0.3s ease;
+ }
+
+ .button-group button:hover {
+     background-color: #004999;
+ }
+
+ .btn-familias {
+     background-color: #2196F3 !important;
+ }
+
+ .btn-familias:hover {
+     background-color: #0b7dda !important;
+ }
+
+ .btn-logout {
+     background-color: #f44336 !important;
+ }
+
+ .btn-logout:hover {
+     background-color: #d32f2f !important;
+ }
+
+ /* ==== LISTA DE MEMBROS ==== */
+ #lista-membros {
+     margin-top: 20px;
+     border-top: 1px solid #eee;
+     padding-top: 20px;
+ }
+
+ .membro-item {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 15px;
+     margin-bottom: 10px;
+     border-radius: 8px;
+     background: white;
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+     transition: all 0.3s ease;
+ }
+
+ .membro-item:nth-child(even) {
+     background-color: #f9f9f9;
+ }
+
+ .membro-item:hover {
+     background-color: #f0f0f0;
+     transform: translateY(-2px);
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ }
+
+ .membro-info {
+     flex: 1;
+ }
+
+ .membro-nome {
+     font-weight: bold;
+     display: block;
+     margin-bottom: 5px;
+     font-size: 1.1rem;
+ }
+
+ .membro-detalhes {
+     color: #666;
+     font-size: 0.9rem;
+ }
+
+ /* Botão de remoção */
+ .btn-remover {
+     background-color: #f44336;
+     color: white;
+     border: none;
+     padding: 8px 12px;
+     border-radius: 5px;
+     cursor: pointer;
+     transition: all 0.3s;
+     display: flex;
+     align-items: center;
+     gap: 5px;
+ }
+
+ .btn-remover:hover {
+     background-color: #d32f2f;
+ }
+
+ .btn-remover:disabled {
+     background-color: #cccccc;
+     cursor: not-allowed;
+ }
+
+ /* ==== MENSAGENS ==== */
+ .mensagem {
+     padding: 15px;
+     border-radius: 8px;
+     margin: 20px 0;
+     font-size: 1.1rem;
+     text-align: center;
+     font-weight: bold;
+ }
+
+ .sucesso {
+     background-color: #e8f5e9;
+     color: #2e7d32;
+     border: 2px solid #4caf50;
+ }
+
+ .erro {
+     background-color: #ffebee;
+     color: #c62828;
+     border: 2px solid #f44336;
+ }
+
+ /* ==== FOOTER ==== */
+ footer {
+     text-align: center;
+     padding: 2rem;
+     color: white;
+     background: #333;
+     margin-top: 2rem;
+ }
+
+ /* ==== RESPONSIVIDADE ==== */
+ @media (max-width: 768px) {
+     .perfil-usuario {
+         position: static;
+         justify-content: center;
+         margin-top: 15px;
+     }
+
+     .form-grid {
+         grid-template-columns: 1fr;
+     }
+
+     .membro-item {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 10px;
+     }
+
+     .membro-acoes {
+         align-self: flex-end;
+     }
+ }

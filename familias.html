@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Família</title>
+    <title>Status da Família - Programa Bolsa Família</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
@@ -12,7 +12,7 @@
         <div class="logo-container">
             <img src="img/logo.png" alt="Logo do Programa Bolsa Família" id="Logo">
         </div>
-        <h1>Minha Família</h1>
+        <h1>Status da Família</h1>
     </header>
 
     <main class="container">
@@ -23,22 +23,18 @@
         </div>
         
         <section class="content-section">
-            <h2><i class="fas fa-home"></i> Informações da Família</h2>
+            <h2><i class="fas fa-home"></i> Resultado da Elegibilidade</h2>
             
-            <div id="resultado-elegibilidade" class="resultado-box"></div>
-            
-            <div class="familia-info">
-                <div class="membros-container">
-                    <h3><i class="fas fa-users"></i> Membros da Família</h3>
-                    <p>Selecione um membro para remover:</p>
-                    <ul id="lista-membros" class="membros-list"></ul>
+            <div class="status-container">
+                <div id="status-icon" class="status-icon">
+                    <i class="fas fa-spinner fa-spin"></i>
                 </div>
                 
-                <div class="button-group">
-                    <button id="btn-remover-membro" class="btn-logout" disabled>
-                        <i class="fas fa-user-minus"></i> Remover Membro Selecionado
-                    </button>
+                <div id="resultado-elegibilidade" class="resultado-box">
+                    Verificando elegibilidade da família...
                 </div>
+                
+                
             </div>
         </section>
     </main>

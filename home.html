@@ -2,71 +2,118 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Gerenciador de membros</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Familiar - Programa Bolsa Família</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="css/home-style.css">
 </head>
+
 <body>
     <header>
-        <img src="img/grafico.png" alt="Divisão da população brasileira" id="grafico">
-        <h1>Verificação de quem tem direito</h1>
+        <div class="logo-container">
+            <img src="img/logo.png" alt="Logo do Programa Bolsa Família" id="Logo">
+        </div>
         <div id="perfil-logado" class="perfil-usuario">
-            Olá, <span id="nome-usuario">Visitante</span>!
-            <button id="btn-editar-perfil">Editar Perfil</button>
+            <i class="fas fa-user-circle"></i>
+            <span id="nome-usuario">Visitante</span>
+            <button onclick="logout()" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
         </div>
     </header>
 
     <main>
-        <section class="cadastro-section">
-            <h2>Cadastro de Membros da Família</h2>
-            <form id="familia-form" class="cadastro-form">
-                <input type="text" id="nome" placeholder="Nome completo do membro" required>
-                <input type="text" id="grauParentesco" placeholder="Parentesco (ex: pai, mãe)" required>
+        <section class="content-section">
+            <h2><i class="fas fa-user-plus"></i> Cadastrar Novo Membro da Família</h2>
 
-                <select id="sexo" required>
-                    <option value="">Selecione o sexo</option>
-                    <option value="Feminino">Feminino</option>
-                    <option value="Masculino">Masculino</option>
-                    <option value="Prefiro não dizer">Prefiro não dizer</option>
-                    <option value="Outro">Outro</option>
-                </select>
+            <div id="mensagem" class="mensagem"></div>
 
-                <select id="estadoCivil" required>
-                    <option value="">Estado Civil</option>
-                    <option value="Solteiro(a)">Solteiro(a)</option>
-                    <option value="Casado(a)">Casado(a)</option>
-                    <option value="Divorciado(a)">Divorciado(a)</option>
-                    <option value="Viúvo(a)">Viúvo(a)</option>
-                    <option value="UniaoEstavel">União Estável</option>
-                    <option value="NaoInformado">Não Informado</option>
-                </select>
-                <input type="text" id="cpf" placeholder="Cpf" required>
-                <input type="text" id="ocupacao" placeholder="Ocupação" required>
-                <input type="tel" id="telefone" placeholder="Telefone" required>
-                <input type="number" id="renda" placeholder="Salário (R$)" required step="0.01">
-                <button type="submit">Adicionar Membro</button>
+            <form id="familia-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nome">Nome completo</label>
+                        <input type="text" id="nome" class="campo-input" placeholder="Nome completo do membro" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="grauParentesco">Parentesco</label>
+                        <input type="text" id="grauParentesco" class="campo-input" placeholder="Ex: pai, mãe, filho"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sexo">Sexo</label>
+                        <select id="sexo" class="campo-input" required>
+                            <option value="">Selecione o sexo</option>
+                            <option value="0">Não Informado</option>
+                            <option value="1">Masculino</option>
+                            <option value="2">Feminino</option>
+                            <option value="3">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estadoCivil">Estado Civil</label>
+                        <select id="estadoCivil" class="campo-input" required>
+                            <option value="">Estado Civil</option>
+                            <option value="0">Não Informado</option>
+                            <option value="1">Solteiro(a)</option>
+                            <option value="2">Casado(a)</option>
+                            <option value="3">Divorciado(a)</option>
+                            <option value="4">Viúvo(a)</option>
+                            <option value="5">União Estável</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cpf">CPF</label>
+                        <input type="text" id="cpf" class="campo-input" placeholder="000.000.000-00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ocupacao">Ocupação</label>
+                        <input type="text" id="ocupacao" class="campo-input" placeholder="Profissão ou ocupação"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefone">Telefone</label>
+                        <input type="tel" id="telefone" class="campo-input" placeholder="(00) 00000-0000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="renda">Renda Mensal (R$)</label>
+                        <input type="number" id="renda" class="campo-input" placeholder="0,00" required step="0.01">
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-user-plus"></i> Adicionar Membro
+                    </button>
+                </div>
             </form>
         </section>
 
-        <section>
-            <h3>Lista de membros:</h3>
-            <ul id="lista-membros"></ul>
+        <section class="content-section">
+            <h2><i class="fas fa-users"></i> Membros Cadastrados</h2>
+            <div id="lista-membros">
+                <!-- Membros serão carregados aqui -->
+            </div>
         </section>
 
-        <section>
-            <h3>Resultado</h3>
-            <p id="resultado-renda"></p>
-        </section>
-
-        <section>
-            <button id="btn-concluir">Concluir Família</button>
-            <button type="button" onclick="window.location.href='familias.html'">Ver Famílias Cadastradas</button>
-            <button onclick="logout()">Sair</button> 
-        </section>
-
-        <section id="familias-container">
-            <h2>Famílias cadastradas</h2>
+        <section class="content-section">
+            <div class="button-group">
+                <button onclick="window.location.href='familias.html'" class="btn-familias">
+                    <i class="fas fa-eye"></i> Ver Status da Família
+                </button>
+            </div>
         </section>
     </main>
+
+    <footer>
+        <p>&copy; 2025 Programa Bolsa Família - Todos os direitos reservados</p>
+    </footer>
 
     <script src="js/home.js"></script>
 </body>
