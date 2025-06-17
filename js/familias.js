@@ -107,7 +107,7 @@ function removerParente(idParente) {
     }
 
     if (confirm("Deseja remover este parente?")) {
-        fetch(`https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes/{id}${familiaId}`, {
+        fetch(`https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes/${idParente}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -117,12 +117,7 @@ function removerParente(idParente) {
         .then(res => {
             if (res.ok) {
                 alert("Parente removido com sucesso.");
-                // Remover o parente do array local
-                location.reload(); //Recarrega a lista
-                const container = document.getElementById("familias-container");
-                const familia = container.querySelector(`.familia-card:nth-child(${index + 1})`);
-                familia.remove(); // Remove o card da DOM
-
+                location.reload(); // Recarrega a página para atualizar a lista
             } else {
                 alert("Erro ao remover o parente.");
             }
@@ -133,3 +128,4 @@ function removerParente(idParente) {
         });
     }
 }
+
