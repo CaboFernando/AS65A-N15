@@ -25,6 +25,9 @@ document.getElementById("recuperarForm").addEventListener("submit", async functi
     if (resposta.ok) {
       mensagem.textContent = "Senha alterada com sucesso!";
       mensagem.style.color = "green";
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 2000);
     } else {
       mensagem.textContent = "Não foi possível alterar a senha. Verifique o CPF e e-mail.";
       mensagem.style.color = "red";
