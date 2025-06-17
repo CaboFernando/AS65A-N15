@@ -28,7 +28,30 @@ document.addEventListener('DOMContentLoaded', () => {
     } 
 });
 
+document.addEventListener("DOMContentLoaded", carregarParentesDoBackend);
+
 let membros = [];
+
+async function carregarParentesDoBackend() {
+    const userId = localStorage.getItem("userId"); 
+
+    if (!userId || !token) return;
+
+    const response = await fetch(`https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes/usuario/${userId}`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    if (response.ok) {
+        membros = await response.json();
+        atualizarLista();
+        calcularRenda();
+    } else {
+        alert("Erro ao buscar parentes.");
+    }
+}
+
 
 function logout() {
     localStorage.removeItem("token");
@@ -54,10 +77,28 @@ function atualizarLista() {
         const rendaFormatada = !isNaN(renda) ? renda.toFixed(2) : "0.00";
 
         const li = document.createElement("li");
-        li.textContent = `${membro.nome} - ${membro.grauParentesco} - ${membro.sexo} - R$${rendaFormatada}`;
+        li.textContent = `${membro.nome} - ${membro.grauParentesco} - ${membro.sexo} - R$${rendaFormatada} `;
+
+        const btnRemover = document.createElement("button");
+        btnRemover.textContent = "Remover";
+        btnRemover.onclick = async () => {
+            if (confirm(`Remover ${membro.nome}?`)) {
+                try {
+                    await removerMembro(membro.idParente); // Precisa que a API retorne o ID
+                    membros = membros.filter(m => m.idParente !== membro.idParente);
+                    atualizarLista();
+                    calcularRenda();
+                } catch (err) {
+                    alert("Erro ao remover membro.");
+                }
+            }
+        };
+
+        li.appendChild(btnRemover);
         lista.appendChild(li);
     });
 }
+
 
 function calcularRenda() {
     if (membros.length === 0) {
@@ -117,6 +158,20 @@ async function cadastrarFamilia(membros) {
         }
     }
 }
+//Funcao para remover 
+async function removerMembro(idParente) {
+    const response = await fetch(`https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes/${idParente}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error("Erro ao remover parente.");
+    }
+}
+
 
 // =========================================================
 // Evento de envio do formulário

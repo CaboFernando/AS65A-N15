@@ -23,8 +23,8 @@ Este repositório contém o código fonte da aplicação de front-end que será 
 **Tecnologias Utilizadas**
 
 - **JavaScript**: 58.3%
-- **HTML**: 27.1%
-- **CSS**: 14.6%
+- **HTML**: 27.6%
+- **CSS**: 14.1%
 
 ---
 
