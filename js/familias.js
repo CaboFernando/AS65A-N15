@@ -63,7 +63,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 <p><strong>Renda total:</strong> R$${total.toFixed(2)}</p>
                 <p><strong>Renda per capita:</strong> R$${perCapita.toFixed(2)}</p>
                 <p><strong>Resultado:</strong> ${resultado}</p>
-                <button class="remove-btn" onclick="removerFamilia(${index}, '${familia.id}')">Remover</button>
+                <ul class="membros-list">
+                    ${familia.membros.map(m => `
+                        <li>
+                            ${m.nome} (${m.grauParentesco}) - R$${m.renda.toFixed(2)}
+                            <button onclick="removerParente(${m.idParente})">Remover</button>
+                        </li>
+                    `).join('')}
+                </ul>
             `;
 
             container.appendChild(card);
@@ -90,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Função para remover parente
-function removerFamilia(index, familiaId) {
+function removerParente(idParente) {
     const token = localStorage.getItem("token");
     const usuarioId = localStorage.getItem("idUsuario");
 
@@ -111,6 +118,7 @@ function removerFamilia(index, familiaId) {
             if (res.ok) {
                 alert("Parente removido com sucesso.");
                 // Remover o parente do array local
+                location.reload(); //Recarrega a lista
                 const container = document.getElementById("familias-container");
                 const familia = container.querySelector(`.familia-card:nth-child(${index + 1})`);
                 familia.remove(); // Remove o card da DOM
