@@ -1,103 +1,168 @@
 document.addEventListener("DOMContentLoaded", function () {
     const token = localStorage.getItem("token");
-    const usuarioId = localStorage.getItem("idUsuario"); // ID do usuário logado
+    const usuarioId = localStorage.getItem("idUsuario");
+    const listaMembros = document.getElementById("lista-membros");
+    const resultadoElegibilidade = document.getElementById("resultado-elegibilidade");
+    const btnRemover = document.getElementById("btn-remover-membro");
+    
+    let membroSelecionado = null;
 
     if (!token || !usuarioId) {
-        alert("Você precisa estar autenticado para visualizar suas famílias.");
-        window.location.href = "index.html"; // Redireciona para o login se não estiver autenticado
+        alert("Você precisa estar autenticado para visualizar sua família.");
+        window.location.href = "index.html";
         return;
     }
 
-    // Buscar os parentes do usuário logado
-    fetch(`https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes?idUsuario=${usuarioId}`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        }
-    })
-    .then(res => res.json())
-    .then(response => {
-        console.log("Resposta da API:", response);  // Debug: Verificar o que a API está retornando
-        const parentes = response.data || [];  // Ajuste caso a resposta venha em 'data'
+    carregarMembrosFamilia();
 
-        if (Array.isArray(parentes)) {
-            renderizarFamilias(parentes);
-        } else {
-            alert("A resposta da API não contém dados de parentes no formato esperado.");
-        }
-    })
-    .catch(err => {
-        console.error("Erro ao carregar os parentes:", err);
-        alert("Não foi possível carregar os parentes.");
-    });
+    function carregarMembrosFamilia() {
+        fetch(`https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes?idUsuario=${usuarioId}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Dados dos membros da família:", data);
+            
+            const membros = data.data || [];
+            
+            exibirMembros(membros);
+        })
+        .catch(error => {
+            console.error("Erro ao carregar os membros da família:", error);
+            resultadoElegibilidade.textContent = "Erro ao carregar os membros da família.";
+            resultadoElegibilidade.className = "resultado-box erro";
+        });
+    }
 
-    // Função para renderizar os parentes como famílias
-    function renderizarFamilias(parentes) {
-        const container = document.getElementById("familias-container");
-        container.innerHTML = "";
+    function verificarElegibilidade() {
+        fetch("https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes/renda", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Resposta da API de elegibilidade:", data);
+            
+            resultadoElegibilidade.innerHTML = "";
+            
+            if (data.success) {
+                resultadoElegibilidade.textContent = data.message;
+                
+                const isElegivel = data.message.includes("elegível") && 
+                                  !data.message.includes("NÃO elegível");
+                
+                resultadoElegibilidade.className = "resultado-box " + 
+                    (isElegivel ? "elegivel" : "nao-elegivel");
+            } else {
+                resultadoElegibilidade.textContent = data.message || "Não foi possível verificar a elegibilidade.";
+                resultadoElegibilidade.className = "resultado-box nao-elegivel";
+            }
+        })
+        .catch(error => {
+            console.error("Erro ao verificar elegibilidade:", error);
+            resultadoElegibilidade.textContent = "Erro ao verificar elegibilidade.";
+            resultadoElegibilidade.className = "resultado-box erro";
+        });
+    }
 
-        if (!parentes || parentes.length === 0) {
-            container.innerHTML = "<p>Nenhum parente cadastrado.</p>";
+    function exibirMembros(membros) {
+        listaMembros.innerHTML = "";
+        
+        if (!membros || membros.length === 0) {
+            listaMembros.innerHTML = "<li class='membro-item'>Nenhum membro cadastrado na família</li>";
             return;
         }
-
-        // Agrupando os parentes em uma "família" (ajuste conforme necessário)
-        const familias = agruparFamilias(parentes);
-
-        familias.forEach((familia, index) => {
-            const total = familia.membros.reduce((soma, membro) => soma + membro.renda, 0);
-            const perCapita = total / familia.membros.length;
-            const resultado = perCapita <= 218
-                ? "TEM direito ao Bolsa Família"
-                : "NÃO tem direito ao Bolsa Família";
-
-            const card = document.createElement("div");
-            card.className = "familia-card";
-
-            card.innerHTML = `
-                <h3>Família #${index + 1}</h3>
-                <ul class="membros-list">
-                    ${familia.membros.map(m => `<li>${m.nome} (${m.grauParentesco}) - R$${m.renda.toFixed(2)}</li>`).join('')}
-                </ul>
-                <p><strong>Renda total:</strong> R$${total.toFixed(2)}</p>
-                <p><strong>Renda per capita:</strong> R$${perCapita.toFixed(2)}</p>
-                <p><strong>Resultado:</strong> ${resultado}</p>
-                <ul class="membros-list">
-                    ${familia.membros.map(m => `
-                        <li>
-                            ${m.nome} (${m.grauParentesco}) - R$${m.renda.toFixed(2)}
-                            <button onclick="removerParente(${m.idParente})">Remover</button>
-                        </li>
-                    `).join('')}
-                </ul>
+        
+        const responsavel = membros.find(m => 
+            m.grauParentesco.toLowerCase().includes("responsável") || 
+            m.grauParentesco.toLowerCase().includes("responsavel")
+        );
+        
+        membros.forEach(membro => {
+            const li = document.createElement("li");
+            li.className = "membro-item";
+            li.dataset.id = membro.id;
+            
+            const isResponsavel = responsavel && (membro.id === responsavel.id);
+            
+            li.innerHTML = `
+                <div class="membro-info">
+                    <span class="membro-nome">${membro.nome} ${isResponsavel ? '<span class="responsavel-tag">(Responsável)</span>' : ''}</span>
+                    <div class="membro-detalhes">
+                        ${membro.grauParentesco} | CPF: ${formatarCPF(membro.cpf)} | Renda: R$${parseFloat(membro.renda).toFixed(2)}
+                    </div>
+                </div>
+                <div class="membro-acoes">
+                    ${isResponsavel ? 
+                        '<span class="responsavel-info">Não pode ser removido</span>' : 
+                        '<span class="selecionador"></span>'
+                    }
+                </div>
             `;
-
-            container.appendChild(card);
+            
+            if (!isResponsavel) {
+                li.addEventListener("click", function() {
+                    if (li.classList.contains("selecionado")) {
+                        li.classList.remove("selecionado");
+                        membroSelecionado = null;
+                        btnRemover.disabled = true;
+                    } 
+                    else {
+                        document.querySelectorAll(".membro-item").forEach(item => {
+                            item.classList.remove("selecionado");
+                        });
+                        
+                        li.classList.add("selecionado");
+                        membroSelecionado = membro;
+                        btnRemover.disabled = false;
+                    }
+                });
+            } else {
+                li.classList.add("responsavel");
+            }
+            
+            listaMembros.appendChild(li);
         });
+        
+        verificarElegibilidade();
     }
 
-    // Função para agrupar os parentes em famílias (ajuste conforme a lógica que você deseja)
-    function agruparFamilias(parentes) {
-        const familias = [];
-        let familiaAtual = { membros: [] };
+    function formatarCPF(cpf) {
+        if (!cpf) return "Não informado";
+        const numeros = cpf.replace(/\D/g, '');
+        return numeros.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    }
 
-        parentes.forEach(parente => {
-            // Supondo que todos os parentes são membros da mesma família (ajuste se necessário)
-            familiaAtual.membros.push(parente);
-        });
-
-        // Se houver membros, agrupar em uma família
-        if (familiaAtual.membros.length > 0) {
-            familias.push(familiaAtual);
+    btnRemover.addEventListener("click", function() {
+        if (membroSelecionado) {
+            const idParaRemover = membroSelecionado.id;
+            if (idParaRemover) {
+                removerParente(idParaRemover);
+            } else {
+                alert("ID do membro não encontrado. Não é possível remover.");
+            }
         }
-
-        return familias;
-    }
+    });
 });
 
-// Função para remover parente
-function removerParente(idParente) {
+function removerParente(id) {
     const token = localStorage.getItem("token");
     const usuarioId = localStorage.getItem("idUsuario");
 
@@ -106,30 +171,27 @@ function removerParente(idParente) {
         return;
     }
 
-    if (confirm("Deseja remover este parente?")) {
-        fetch(`https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes/{id}${familiaId}`, {
+    if (confirm("Deseja remover este membro da família?")) {
+        fetch(`https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/Parentes/${id}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
         })
-        .then(res => {
-            if (res.ok) {
-                alert("Parente removido com sucesso.");
-                // Remover o parente do array local
-                location.reload(); //Recarrega a lista
-                const container = document.getElementById("familias-container");
-                const familia = container.querySelector(`.familia-card:nth-child(${index + 1})`);
-                familia.remove(); // Remove o card da DOM
-
+        .then(response => {
+            if (response.ok) {
+                alert("Membro removido com sucesso.");
+                location.reload();
             } else {
-                alert("Erro ao remover o parente.");
+                return response.text().then(text => {
+                    throw new Error(text || "Erro ao remover o membro");
+                });
             }
         })
-        .catch(err => {
-            console.error("Erro ao remover o parente:", err);
-            alert("Erro de conexão.");
+        .catch(error => {
+            console.error("Erro ao remover o membro:", error);
+            alert(`Erro ao remover membro: ${error.message}`);
         });
     }
 }
