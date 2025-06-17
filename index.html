@@ -3,81 +3,111 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title> Bolsa Familia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programa Bolsa Família</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body>
-
-    <section>
-        <form id="login-form">
-            <div class="login-campos">
-                <h2>Login:</h2>
-                <input type="text" id="login" placeholder="Email ou CPF">
-                <input type="password" id="senha" placeholder="Senha">
-                <button type="submit">Entrar</button>
-                <button type="button" onclick="window.location.href='cadastro.html'">Cadastrar</button>
-                <button type="button" onclick="window.location.href='recuperar.html'">Recuperar Senha</button>
-            </div>
-        </form>
-    </section><br>
-
-    <hr>
-
-    <br>
     <header>
-        <img src="img/logo.png" alt="logo pagina" id="Logo"><br>
-        <h1>Programa Bolsa Familia</h1>
+        <div class="logo-container">
+            <img src="img/logo.png" alt="Logo do Programa Bolsa Família" id="Logo">
+        </div>
+        <h1>Programa Bolsa Família</h1>
     </header>
 
-    <section>
-        <p>
-            O Programa Bolsa Família é uma iniciativa de transferência de renda com condicionalidades nas áreas de saúde
-            e educação. São elegíveis ao programa as famílias inscritas no Cadastro Único que estejam em situação de
-            pobreza, com renda per capita de até R$ 218,00 (duzentos e dezoito reais).
-        </p>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>20 Anos Transformando Vidas</h1>
+                <p>O Programa Bolsa Família é uma iniciativa de transferência de renda com condicionalidades nas áreas de saúde e educação, beneficiando milhões de famílias em todo o Brasil.</p>
+            </div>
+        </section>
 
-        <br>
+        <section class="features">
+            <div class="feature-card">
+                <i class="fas fa-hand-holding-heart"></i>
+                <h3>Transferência de Renda</h3>
+                <p>Auxílio financeiro direto às famílias em situação de vulnerabilidade social.</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-heartbeat"></i>
+                <h3>Condicionalidades de Saúde</h3>
+                <p>Acompanhamento pré-natal, vacinação e monitoramento nutricional.</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Condicionalidades de Educação</h3>
+                <p>Garantia de frequência escolar mínima para crianças e adolescentes.</p>
+            </div>
+        </section>
 
-        <p><strong>Na saúde:</strong></p>
+        <section class="content-section">
+            <h2>Como Funciona o Programa</h2>
+            <p>O Programa Bolsa Família é destinado a famílias em situação de pobreza, com renda per capita de até R$ 218,00 (duzentos e dezoito reais).</p>
+            
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <h4><i class="fas fa-stethoscope"></i> Saúde</h4>
+                    <ul>
+                        <li>Realização de pré-natal, no caso de gestantes;</li>
+                        <li>Cumprimento do calendário nacional de vacinação;</li>
+                        <li>Acompanhamento do estado nutricional de crianças com menos de 7 anos.</li>
+                    </ul>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4><i class="fas fa-book"></i> Educação</h4>
+                    <ul>
+                        <li>Frequência escolar mínima de 60% para crianças de 4 e 5 anos de idade;</li>
+                        <li>Frequência escolar mínima de 75% para crianças e adolescentes entre 6 e 17 anos.</li>
+                    </ul>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4><i class="fas fa-money-bill-wave"></i> Benefícios</h4>
+                    <ul>
+                        <li>Benefício Renda de Cidadania (por pessoa) + Benefício Complementar, quando necessário, para atingir o piso de R$ 600,00;</li>
+                        <li>Benefício Primeira Infância: R$ 150,00 por criança de até 6 anos;</li>
+                        <li>Benefício Variável Familiar: R$ 50,00 para gestantes, nutrizes, crianças e adolescentes entre 7 e 17 anos.</li>
+                    </ul>
+                </div>
+                
+                <div class="benefit-item">
+                    <h4><i class="fas fa-shield-alt"></i> Regra de Proteção</h4>
+                    <p>A Regra de Proteção garante a permanência da família no programa por até 24 meses, mesmo em caso de aumento de renda, desde que o valor não ultrapasse meio salário mínimo per capita. Durante esse período, a família receberá 50% do valor do benefício.</p>
+                </div>
+            </div>
+        </section>
 
-        <br>
+        <section class="login-section">
+            <h2>Acesse sua conta</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login">Email ou CPF</label>
+                    <input type="text" id="login" placeholder="Digite seu email ou CPF" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" placeholder="Digite sua senha" required>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit">Entrar</button>
+                    <button type="button" onclick="window.location.href='cadastro.html'">Cadastrar</button>
+                    <button type="button" onclick="window.location.href='recuperar.html'">Esqueci a senha</button>
+                </div>
+            </form>
+        </section>
+    </main>
 
-        <ul>
-            <li>Realização de pré-natal, no caso de gestantes;</li>
-            <li>Cumprimento do calendário nacional de vacinação;</li>
-            <li>Acompanhamento do estado nutricional de crianças com menos de 7 anos.</li>
-        </ul>
-
-        <p><strong>Na educação:</strong></p>
-        <ul>
-            <li>Frequência escolar mínima de 60% para crianças de 4 e 5 anos de idade;</li>
-            <li>Frequência escolar mínima de 75% para crianças e adolescentes entre 6 e 17 anos.</li>
-        </ul>
-
-        <p>A parcela mensal recebida pela família é composta pela soma dos seguintes benefícios:</p>
-        <ul>
-            <li>Benefício Renda de Cidadania (por pessoa) + Benefício Complementar, quando necessário, para atingir o
-                piso de R$ 600,00;</li>
-            <li>Benefício Primeira Infância: R$ 150,00 por criança de até 6 anos;</li>
-            <li>Benefício Variável Familiar: R$ 50,00 para gestantes, nutrizes, crianças e adolescentes entre 7 e 17
-                anos.</li>
-        </ul>
-        <br>
-        <p>
-            <strong>Regra de Proteção do Bolsa Família:</strong><br>
-            A Regra de Proteção garante a permanência da família no programa por até 24 meses, mesmo em caso de aumento
-            de renda, desde que o valor não ultrapasse meio salário mínimo per capita. Durante esse período, a família
-            receberá 50% do valor do benefício. Se a renda voltar a cair abaixo de R$ 218,00 por pessoa, a família terá
-            direito ao retorno integral ao programa.
-        </p>
-
-        <p>
-            Atualmente, 34,1% de todos os inscritos estão no programa há 10 anos ou mais. Não há um limite de
-            permanência, mas o governo incentiva a saída gradativa. De acordo com dados de fevereiro de 2025, das 20,6
-            milhões de famílias cadastradas, 7 milhões recebem o benefício há mais de uma década.
-        </p>
-    </section>
+    <footer>
+        <p style="color: white">&copy; 2025 Programa Bolsa Família - Todos os direitos reservados</p>
+    </footer>
 
     <script src="js/login.js"></script>
 </body>
