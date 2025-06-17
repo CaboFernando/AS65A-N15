@@ -43,6 +43,7 @@ Este repositório contém o código fonte da aplicação de front-end que será 
 - `home.html`: Página inicial.
 - `index.html`: Página de entrada.
 - `membro.html`: Página de membros.
+- `recuperar.html`: Página de recuperação de senha.
 - `package-lock.json`: Bloqueio de versões das dependências.
 - `package.json`: Configurações do projeto e dependências.
 
