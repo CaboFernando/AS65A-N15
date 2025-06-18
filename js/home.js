@@ -3,28 +3,20 @@ const API_BASE_URL = 'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.a
 let membrosFamilia = [];
 let responsavelId = null; // Para armazenar o ID do responsável
 
-// Mapeamento de valores numéricos para texto
-const sexoMap = {
-    0: "Não Informado",
-    1: "Masculino",
-    2: "Feminino",
-    3: "Outro"
-};
-
-const estadoCivilMap = {
-    0: "Não Informado",
-    1: "Solteiro(a)",
-    2: "Casado(a)",
-    3: "Divorciado(a)",
-    4: "Viúvo(a)",
-    5: "União Estável"
-};
+// Mapeamento de valores numéricos para texto - Estes serão preenchidos dinamicamente
+let sexoMap = {};
+let estadoCivilMap = {};
 
 // Elementos DOM
 const nomeUsuario = document.getElementById('nome-usuario');
 const listaMembros = document.getElementById('lista-membros');
 const mensagemElement = document.getElementById('mensagem');
 const familiaForm = document.getElementById('familia-form');
+
+// Dropdown elements
+const grauParentescoSelect = document.getElementById('grauParentesco');
+const sexoSelect = document.getElementById('sexo');
+const estadoCivilSelect = document.getElementById('estadoCivil');
 
 // Função para exibir mensagens
 function exibirMensagem(texto, tipo) {
@@ -34,6 +26,56 @@ function exibirMensagem(texto, tipo) {
         mensagemElement.textContent = '';
         mensagemElement.className = 'mensagem';
     }, 5000);
+}
+
+// Função para carregar dados de dropdowns
+async function carregarDropdown(url, selectElement, valueField, textField) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Erro ao carregar dados de ${url}`);
+        }
+        const data = await response.json();
+        if (data.success && data.data) {
+            // Clear existing options
+            selectElement.innerHTML = '';
+            // Add a default "select" option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = `Selecione o ${selectElement.id === 'sexo' ? 'sexo' : selectElement.id === 'estadoCivil' ? 'estado civil' : 'grau de parentesco'}`;
+            selectElement.appendChild(defaultOption);
+
+            if (Array.isArray(data.data)) {
+                data.data.forEach(item => {
+                    const option = document.createElement('option');
+                    if (typeof item === 'object' && item !== null) {
+                        option.value = item[valueField];
+                        // Adjust "NaoInformado" to "Não Informado" for display
+                        if (item[textField] === "NaoInformado") {
+                            option.textContent = "Não Informado";
+                        } else {
+                            option.textContent = item[textField];
+                        }
+                        // Populate map for display purposes
+                        if (selectElement.id === 'sexo') {
+                            sexoMap[item[valueField]] = option.textContent; // Use adjusted text
+                        } else if (selectElement.id === 'estadoCivil') {
+                            estadoCivilMap[item[valueField]] = option.textContent; // Use adjusted text
+                        }
+                    } else { // For the 'tipos-parentesco' endpoint which returns an array of strings
+                        option.value = item;
+                        option.textContent = item;
+                    }
+                    selectElement.appendChild(option);
+                });
+            }
+        } else {
+            exibirMensagem(`Erro ao carregar dados de ${url}: ${data.message || 'Dados inválidos'}`, 'erro');
+        }
+    } catch (error) {
+        console.error(`Erro ao carregar dropdown de ${url}:`, error);
+        exibirMensagem(`Erro ao carregar opções para ${selectElement.id}`, 'erro');
+    }
 }
 
 // Função para carregar membros da família da API
@@ -66,7 +108,7 @@ async function carregarMembrosFamilia() {
         // Identificar o responsável (primeiro membro ou aquele com grau "Responsável")
         responsavelId = null;
         membrosFamilia.forEach(membro => {
-            if (membro.grauParentesco.toLowerCase().includes("responsável")) {
+            if (membro.grauParentesco && membro.grauParentesco.toLowerCase().includes("responsável")) {
                 responsavelId = membro.id;
             }
         });
@@ -246,13 +288,19 @@ function logout() {
 }
 
 // Inicialização da página
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     // Exibir nome do usuário
     const userName = localStorage.getItem('userName') || 'Visitante';
     nomeUsuario.textContent = userName;
 
-    // Carregar membros da família
-    carregarMembrosFamilia();
+    // Carregar dados dos dropdowns
+    // Para 'tipos-parentesco', não precisamos de valueField/textField porque o 'data' é um array de strings
+    await carregarDropdown(`${API_BASE_URL}/api/DropDowns/tipos-parentesco`, grauParentescoSelect);
+    await carregarDropdown(`${API_BASE_URL}/api/DropDowns/generos`, sexoSelect, 'value', 'name');
+    await carregarDropdown(`${API_BASE_URL}/api/DropDowns/estados-civis`, estadoCivilSelect, 'value', 'name');
+
+    // Carregar membros da família (depois que os mapas de dropdown estiverem preenchidos)
+    await carregarMembrosFamilia();
 
     // Event listeners
     familiaForm.addEventListener('submit', adicionarMembro);
