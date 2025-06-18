@@ -18,6 +18,19 @@ const grauParentescoSelect = document.getElementById('grauParentesco');
 const sexoSelect = document.getElementById('sexo');
 const estadoCivilSelect = document.getElementById('estadoCivil');
 
+// Edit Modal Elements
+const editMembroModal = document.getElementById('editMembroModal');
+const editMembroForm = document.getElementById('editMembroForm');
+const editMembroId = document.getElementById('editMembroId');
+const editNome = document.getElementById('editNome');
+const editGrauParentesco = document.getElementById('editGrauParentesco');
+const editSexo = document.getElementById('editSexo');
+const editEstadoCivil = document.getElementById('editEstadoCivil');
+const editCpf = document.getElementById('editCpf');
+const editOcupacao = document.getElementById('editOcupacao');
+const editTelefone = document.getElementById('editTelefone');
+const editRenda = document.getElementById('editRenda');
+
 // Função para exibir mensagens
 function exibirMensagem(texto, tipo) {
     mensagemElement.textContent = texto;
@@ -29,7 +42,7 @@ function exibirMensagem(texto, tipo) {
 }
 
 // Função para carregar dados de dropdowns
-async function carregarDropdown(url, selectElement, valueField, textField) {
+async function carregarDropdown(url, selectElement, valueField, textField, selectedValue = '') {
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -37,12 +50,11 @@ async function carregarDropdown(url, selectElement, valueField, textField) {
         }
         const data = await response.json();
         if (data.success && data.data) {
-
             selectElement.innerHTML = '';
 
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
-            defaultOption.textContent = `Selecione o ${selectElement.id === 'sexo' ? 'sexo' : selectElement.id === 'estadoCivil' ? 'estado civil' : 'grau de parentesco'}`;
+            defaultOption.textContent = `Selecione o ${selectElement.id === 'sexo' || selectElement.id === 'editSexo' ? 'sexo' : selectElement.id === 'estadoCivil' || selectElement.id === 'editEstadoCivil' ? 'estado civil' : 'grau de parentesco'}`;
             selectElement.appendChild(defaultOption);
 
             if (Array.isArray(data.data)) {
@@ -50,24 +62,25 @@ async function carregarDropdown(url, selectElement, valueField, textField) {
                     const option = document.createElement('option');
                     if (typeof item === 'object' && item !== null) {
                         option.value = item[valueField];
-
                         if (item[textField] === "NaoInformado") {
                             option.textContent = "Não Informado";
                         } else {
                             option.textContent = item[textField];
                         }
-
-                        if (selectElement.id === 'sexo') {
+                        if (selectElement.id === 'sexo' || selectElement.id === 'editSexo') {
                             sexoMap[item[valueField]] = option.textContent;
-                        } else if (selectElement.id === 'estadoCivil') {
+                        } else if (selectElement.id === 'estadoCivil' || selectElement.id === 'editEstadoCivil') {
                             estadoCivilMap[item[valueField]] = option.textContent;
                         }
-                    } else {
+                    } else { // For array of strings (tipos-parentesco)
                         option.value = item;
                         option.textContent = item;
                     }
                     selectElement.appendChild(option);
                 });
+            }
+            if (selectedValue) {
+                selectElement.value = selectedValue;
             }
         } else {
             exibirMensagem(`Erro ao carregar dados de ${url}: ${data.message || 'Dados inválidos'}`, 'erro');
@@ -155,6 +168,9 @@ function renderizarMembros() {
                         <span class="membro-detalhes">Telefone: ${membro.telefone} | Renda: R$ ${membro.renda.toFixed(2)}</span>
                     </div>
                     <div class="membro-acoes">
+                        <button class="btn-editar" onclick="abrirModalEdicao(${membro.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
                         ${membro.id !== responsavelId ?
                 `<button class="btn-remover" onclick="removerMembro(${membro.id})">
                                 <i class="fas fa-trash"></i> Remover
@@ -266,6 +282,82 @@ async function removerMembro(membroId) {
     }
 }
 
+// Funções para o modal de edição
+async function abrirModalEdicao(membroIdToEdit) {
+    const membro = membrosFamilia.find(m => m.id === membroIdToEdit);
+    if (!membro) {
+        exibirMensagem('Membro não encontrado para edição.', 'erro');
+        return;
+    }
+
+    // Populate dropdowns in the modal
+    await carregarDropdown(`${API_BASE_URL}/api/DropDowns/tipos-parentesco`, editGrauParentesco, null, null, membro.grauParentesco);
+    await carregarDropdown(`${API_BASE_URL}/api/DropDowns/generos`, editSexo, 'value', 'name', membro.sexo.toString());
+    await carregarDropdown(`${API_BASE_URL}/api/DropDowns/estados-civis`, editEstadoCivil, 'value', 'name', membro.estadoCivil.toString());
+
+    editMembroId.value = membro.id;
+    editNome.value = membro.nome;
+    editCpf.value = formatarCPF(membro.cpf); // Display formatted CPF, but keep it read-only
+    editOcupacao.value = membro.ocupacao;
+    editTelefone.value = membro.telefone;
+    editRenda.value = membro.renda;
+
+    editMembroModal.style.display = 'block';
+}
+
+function fecharModalEdicao() {
+    editMembroModal.style.display = 'none';
+    editMembroForm.reset();
+}
+
+async function salvarEdicaoMembro(event) {
+    event.preventDefault();
+
+    const token = localStorage.getItem('token');
+    const membroId = editMembroId.value;
+
+    if (!token || !membroId) {
+        alert('Erro: Dados de sessão ou ID do membro ausentes. Por favor, faça login novamente.');
+        logout();
+        return;
+    }
+
+    const membroAtualizado = {
+        nome: editNome.value,
+        grauParentesco: editGrauParentesco.value,
+        sexo: parseInt(editSexo.value),
+        estadoCivil: parseInt(editEstadoCivil.value),
+        cpf: editCpf.value.replace(/\D/g, ''), // CPF is read-only, so just clean it
+        ocupacao: editOcupacao.value,
+        telefone: editTelefone.value.replace(/\D/g, ''),
+        renda: parseFloat(editRenda.value)
+    };
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/Parentes/${membroId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(membroAtualizado)
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            exibirMensagem(result.message || 'Membro atualizado com sucesso!', 'sucesso');
+            fecharModalEdicao();
+            await carregarMembrosFamilia(); // Reload members to show changes
+        } else {
+            const errorData = await response.json();
+            exibirMensagem(`Falha ao atualizar membro: ${errorData.message || response.statusText}`, 'erro');
+        }
+    } catch (error) {
+        console.error('Erro de rede ao atualizar membro:', error);
+        exibirMensagem('Não foi possível conectar para atualizar o membro. Verifique sua conexão.', 'erro');
+    }
+}
+
 // Função para logout
 function logout() {
     if (confirm('Tem certeza que deseja sair do sistema?')) {
@@ -291,4 +383,5 @@ document.addEventListener('DOMContentLoaded', async function () {
     await carregarMembrosFamilia();
 
     familiaForm.addEventListener('submit', adicionarMembro);
+    editMembroForm.addEventListener('submit', salvarEdicaoMembro); // Event listener for edit form
 });

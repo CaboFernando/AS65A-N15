@@ -40,7 +40,8 @@
 
                     <div class="form-group">
                         <label for="grauParentesco">Parentesco</label>
-                        <select id="grauParentesco" class="campo-input" required> <option value="">Selecione o parentesco</option>
+                        <select id="grauParentesco" class="campo-input" required>
+                            <option value="">Selecione o parentesco</option>
                         </select>
                     </div>
 
@@ -48,10 +49,6 @@
                         <label for="sexo">Sexo</label>
                         <select id="sexo" class="campo-input" required>
                             <option value="">Selecione o sexo</option>
-                            <option value="0">Não Informado</option>
-                            <option value="1">Masculino</option>
-                            <option value="2">Feminino</option>
-                            <option value="3">Outro</option>
                         </select>
                     </div>
 
@@ -59,12 +56,6 @@
                         <label for="estadoCivil">Estado Civil</label>
                         <select id="estadoCivil" class="campo-input" required>
                             <option value="">Estado Civil</option>
-                            <option value="0">Não Informado</option>
-                            <option value="1">Solteiro(a)</option>
-                            <option value="2">Casado(a)</option>
-                            <option value="3">Divorciado(a)</option>
-                            <option value="4">Viúvo(a)</option>
-                            <option value="5">União Estável</option>
                         </select>
                     </div>
 
@@ -101,7 +92,7 @@
         <section class="content-section">
             <h2><i class="fas fa-users"></i> Membros Cadastrados</h2>
             <div id="lista-membros">
-                </div>
+            </div>
         </section>
 
         <section class="content-section">
@@ -112,6 +103,65 @@
             </div>
         </section>
     </main>
+
+    <div id="editMembroModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="fecharModalEdicao()">&times;</span>
+            <h2>Editar Membro da Família</h2>
+            <form id="editMembroForm">
+                <input type="hidden" id="editMembroId">
+                <div class="form-group">
+                    <label for="editNome">Nome completo</label>
+                    <input type="text" id="editNome" class="campo-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editGrauParentesco">Parentesco</label>
+                    <select id="editGrauParentesco" class="campo-input" required>
+                        <option value="">Selecione o parentesco</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editSexo">Sexo</label>
+                    <select id="editSexo" class="campo-input" required>
+                        <option value="">Selecione o sexo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editEstadoCivil">Estado Civil</label>
+                    <select id="editEstadoCivil" class="campo-input" required>
+                        <option value="">Estado Civil</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editCpf">CPF</label>
+                    <input type="text" id="editCpf" class="campo-input" required readonly> </div>
+
+                <div class="form-group">
+                    <label for="editOcupacao">Ocupação</label>
+                    <input type="text" id="editOcupacao" class="campo-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editTelefone">Telefone</label>
+                    <input type="tel" id="editTelefone" class="campo-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editRenda">Renda Mensal (R$)</label>
+                    <input type="number" id="editRenda" class="campo-input" required step="0.01">
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Salvar Edição</button>
+                    <button type="button" class="btn-secondary" onclick="fecharModalEdicao()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <footer>
         <p>&copy; 2025 Programa Bolsa Família - Todos os direitos reservados</p>
