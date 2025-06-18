@@ -37,9 +37,9 @@ async function carregarDropdown(url, selectElement, valueField, textField) {
         }
         const data = await response.json();
         if (data.success && data.data) {
-            // Clear existing options
+
             selectElement.innerHTML = '';
-            // Add a default "select" option
+
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = `Selecione o ${selectElement.id === 'sexo' ? 'sexo' : selectElement.id === 'estadoCivil' ? 'estado civil' : 'grau de parentesco'}`;
@@ -50,19 +50,19 @@ async function carregarDropdown(url, selectElement, valueField, textField) {
                     const option = document.createElement('option');
                     if (typeof item === 'object' && item !== null) {
                         option.value = item[valueField];
-                        // Adjust "NaoInformado" to "Não Informado" for display
+
                         if (item[textField] === "NaoInformado") {
                             option.textContent = "Não Informado";
                         } else {
                             option.textContent = item[textField];
                         }
-                        // Populate map for display purposes
+
                         if (selectElement.id === 'sexo') {
-                            sexoMap[item[valueField]] = option.textContent; // Use adjusted text
+                            sexoMap[item[valueField]] = option.textContent;
                         } else if (selectElement.id === 'estadoCivil') {
-                            estadoCivilMap[item[valueField]] = option.textContent; // Use adjusted text
+                            estadoCivilMap[item[valueField]] = option.textContent;
                         }
-                    } else { // For the 'tipos-parentesco' endpoint which returns an array of strings
+                    } else {
                         option.value = item;
                         option.textContent = item;
                     }
@@ -105,7 +105,6 @@ async function carregarMembrosFamilia() {
         const data = await response.json();
         membrosFamilia = data.data || [];
 
-        // Identificar o responsável (primeiro membro ou aquele com grau "Responsável")
         responsavelId = null;
         membrosFamilia.forEach(membro => {
             if (membro.grauParentesco && membro.grauParentesco.toLowerCase().includes("responsável")) {
@@ -113,7 +112,6 @@ async function carregarMembrosFamilia() {
             }
         });
 
-        // Se nenhum responsável foi encontrado, define o primeiro membro como responsável
         if (!responsavelId && membrosFamilia.length > 0) {
             responsavelId = membrosFamilia[0].id;
         }
@@ -138,13 +136,11 @@ function renderizarMembros() {
         const membroElement = document.createElement('div');
         membroElement.className = 'membro-item';
 
-        // Destacar responsável
         if (membro.id === responsavelId) {
             membroElement.style.borderLeft = '4px solid #009688';
             membroElement.style.backgroundColor = '#e0f7fa';
         }
 
-        // Converter valores numéricos para texto para exibição
         const sexoTexto = sexoMap[membro.sexo] || "Não Informado";
         const estadoCivilTexto = estadoCivilMap[membro.estadoCivil] || "Não Informado";
 
@@ -193,7 +189,6 @@ async function adicionarMembro(event) {
         return;
     }
 
-    // Coletar dados do formulário
     const novoMembro = {
         idUsuario: usuarioId,
         nome: document.getElementById('nome').value,
@@ -221,10 +216,8 @@ async function adicionarMembro(event) {
             throw new Error(errorData.message || 'Erro ao adicionar membro');
         }
 
-        // Recarregar a lista de membros
         await carregarMembrosFamilia();
 
-        // Resetar o formulário
         familiaForm.reset();
 
         exibirMensagem('Membro adicionado com sucesso!', 'sucesso');
@@ -263,7 +256,6 @@ async function removerMembro(membroId) {
             throw new Error(errorData.message || 'Erro ao remover membro');
         }
 
-        // Recarregar a lista de membros
         await carregarMembrosFamilia();
 
         exibirMensagem('Membro removido com sucesso!', 'sucesso');
@@ -289,19 +281,14 @@ function logout() {
 
 // Inicialização da página
 document.addEventListener('DOMContentLoaded', async function () {
-    // Exibir nome do usuário
     const userName = localStorage.getItem('userName') || 'Visitante';
     nomeUsuario.textContent = userName;
 
-    // Carregar dados dos dropdowns
-    // Para 'tipos-parentesco', não precisamos de valueField/textField porque o 'data' é um array de strings
     await carregarDropdown(`${API_BASE_URL}/api/DropDowns/tipos-parentesco`, grauParentescoSelect);
     await carregarDropdown(`${API_BASE_URL}/api/DropDowns/generos`, sexoSelect, 'value', 'name');
     await carregarDropdown(`${API_BASE_URL}/api/DropDowns/estados-civis`, estadoCivilSelect, 'value', 'name');
 
-    // Carregar membros da família (depois que os mapas de dropdown estiverem preenchidos)
     await carregarMembrosFamilia();
 
-    // Event listeners
     familiaForm.addEventListener('submit', adicionarMembro);
 });

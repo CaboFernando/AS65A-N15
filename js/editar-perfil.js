@@ -1,5 +1,3 @@
-// js/editar-perfil.js
-
 const API_BASE_URL = 'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net';
 
 // Função logout (global)
@@ -18,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const editNome = document.getElementById('editNome');
     const editCpf = document.getElementById('editCpf');
     const editEmail = document.getElementById('editEmail');
-    const editSenha = document.getElementById('editSenha'); // Campo de nova senha
+    const editSenha = document.getElementById('editSenha'); 
 
     const token = localStorage.getItem('token');
     const idUsuario = localStorage.getItem('idUsuario');
@@ -70,12 +68,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const nome = editNome.value.trim();
         let cpf = editCpf.value.trim();
         const email = editEmail.value.trim();
-        const senha = editSenha.value; // Pega o valor do campo de nova senha
+        const senha = editSenha.value;
 
-        cpf = cpf.replace(/\D/g, ''); // Limpa o CPF para enviar somente números
+        cpf = cpf.replace(/\D/g, '');
 
         console.log('CPF sendo enviado para a API (limpo):', cpf);
-        console.log('Payload completo sendo enviado:', { nome, cpf, email, Senha: senha ? '******' : '[Campo Vazio]' }); // Log para a senha
+        console.log('Payload completo sendo enviado:', { nome, cpf, email, Senha: senha ? '******' : '[Campo Vazio]' });
 
 
         if (!token || !idUsuario) {
@@ -105,16 +103,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.ok) {
-                // Se a resposta for OK (status 200-299), assume que foi um sucesso
-                const result = await response.json(); // Tenta ler a resposta JSON, mesmo que não precise de 'Success'
-                alert(result.message || 'Perfil atualizado com sucesso!'); // Use result.message if available, otherwise a generic success message
+                
+                const result = await response.json(); 
+                alert(result.message || 'Perfil atualizado com sucesso!'); 
                 localStorage.setItem('userName', nome);
                 localStorage.setItem('userCpf', cpf);
                 localStorage.setItem('userEmail', email);
                 window.location.href = 'home.html';
             } else if (response.status === 400) {
                 const errorResult = await response.json();
-                // Mostra a mensagem de erro específica da API
+                
                 let errorMessage = '';
                 if (errorResult.errors) {
                     for (const key in errorResult.errors) {

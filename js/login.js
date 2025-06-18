@@ -1,8 +1,5 @@
-// js/login.js
-
 const API_BASE_URL = 'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net';
 
-// Função auxiliar para decodificar JWT (mantida)
 function decodeJwt(token) {
     try {
         const base64Url = token.split('.')[1];
@@ -62,10 +59,7 @@ document.getElementById("login-form").addEventListener("submit", async function(
         const data = await response.json(); 
 
         console.log("Resposta completa da API de Login:", data);
-
-        // --- CORREÇÃO CRÍTICA AQUI: Ajusta a condição de sucesso ---
-        // Verifica se a resposta HTTP foi OK E se a mensagem da API indica sucesso.
-        // Isso contorna o problema de data.success ser false mesmo em autenticações bem-sucedidas.
+        
         if (response.ok && data.message === "Autenticação realizada com sucesso.") { 
             localStorage.setItem("token", data.token);
             localStorage.setItem("idUsuario", data.idUsuario);
@@ -100,7 +94,6 @@ document.getElementById("login-form").addEventListener("submit", async function(
                 window.location.href = "home.html";
             }
         } else {
-            // Se a resposta HTTP não foi OK, ou a mensagem da API não foi de sucesso.
             alert(data.message || "Login inválido. Verifique suas credenciais.");
             console.warn("Falha no login ou resposta inesperada:", data.message || "Erro desconhecido.");
         }
@@ -110,7 +103,6 @@ document.getElementById("login-form").addEventListener("submit", async function(
     }
 });
 
-// Função logout (global) - mantida
 window.logout = function() {
     localStorage.removeItem('token');
     localStorage.removeItem('idUsuario');
