@@ -1,7 +1,7 @@
 // Configurações globais
 const API_BASE_URL = 'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net';
 let membrosFamilia = [];
-let responsavelId = null; // Para armazenar o ID do responsável
+let responsavelId = null;
 
 // Mapeamento de valores numéricos para texto - Estes serão preenchidos dinamicamente
 let sexoMap = {};
@@ -72,7 +72,7 @@ async function carregarDropdown(url, selectElement, valueField, textField, selec
                         } else if (selectElement.id === 'estadoCivil' || selectElement.id === 'editEstadoCivil') {
                             estadoCivilMap[item[valueField]] = option.textContent;
                         }
-                    } else { // For array of strings (tipos-parentesco)
+                    } else {
                         option.value = item;
                         option.textContent = item;
                     }
@@ -144,6 +144,12 @@ function renderizarMembros() {
         listaMembros.innerHTML = '<p class="mensagem">Nenhum membro cadastrado ainda.</p>';
         return;
     }
+
+    const responsavel = membrosFamilia.find(membro => membro.id === responsavelId);
+    if (responsavel && (responsavel.estadoCivil == 0)) {
+        exibirMensagem('Por favor, preencha a renda do membro responsável pelo grupo familiar para garantir a elegibilidade ao programa.', 'alerta');
+    }
+
 
     membrosFamilia.forEach(membro => {
         const membroElement = document.createElement('div');
@@ -297,7 +303,7 @@ async function abrirModalEdicao(membroIdToEdit) {
 
     editMembroId.value = membro.id;
     editNome.value = membro.nome;
-    editCpf.value = formatarCPF(membro.cpf); // Display formatted CPF, but keep it read-only
+    editCpf.value = formatarCPF(membro.cpf);
     editOcupacao.value = membro.ocupacao;
     editTelefone.value = membro.telefone;
     editRenda.value = membro.renda;
@@ -327,7 +333,7 @@ async function salvarEdicaoMembro(event) {
         grauParentesco: editGrauParentesco.value,
         sexo: parseInt(editSexo.value),
         estadoCivil: parseInt(editEstadoCivil.value),
-        cpf: editCpf.value.replace(/\D/g, ''), // CPF is read-only, so just clean it
+        cpf: editCpf.value.replace(/\D/g, ''),
         ocupacao: editOcupacao.value,
         telefone: editTelefone.value.replace(/\D/g, ''),
         renda: parseFloat(editRenda.value)
@@ -347,7 +353,7 @@ async function salvarEdicaoMembro(event) {
             const result = await response.json();
             exibirMensagem(result.message || 'Membro atualizado com sucesso!', 'sucesso');
             fecharModalEdicao();
-            await carregarMembrosFamilia(); // Reload members to show changes
+            await carregarMembrosFamilia();
         } else {
             const errorData = await response.json();
             exibirMensagem(`Falha ao atualizar membro: ${errorData.message || response.statusText}`, 'erro');
@@ -383,5 +389,5 @@ document.addEventListener('DOMContentLoaded', async function () {
     await carregarMembrosFamilia();
 
     familiaForm.addEventListener('submit', adicionarMembro);
-    editMembroForm.addEventListener('submit', salvarEdicaoMembro); // Event listener for edit form
+    editMembroForm.addEventListener('submit', salvarEdicaoMembro);
 });
