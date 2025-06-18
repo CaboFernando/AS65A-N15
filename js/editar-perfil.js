@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const nome = editNome.value.trim();
         let cpf = editCpf.value.trim();
         const email = editEmail.value.trim();
-        const senha = editSenha.value; // Pega o valor do campo de senha (pode ser vazio)
+        const senha = editSenha.value; // Pega o valor do campo de nova senha
 
         cpf = cpf.replace(/\D/g, ''); // Limpa o CPF para enviar somente números
 
@@ -85,9 +85,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const usuarioUpdateDto = {
-            Nome: nome,   // ALTERAÇÃO AQUI: Nome com 'N' maiúsculo (pode ser necessário)
-            Cpf: cpf,     // ALTERAÇÃO AQUI: Cpf com 'C' maiúsculo (já tinha sido sugerido, mas reforçando)
-            Email: email, // ALTERAÇÃO AQUI: Email com 'E' maiúsculo (pode ser necessário)
+            Nome: nome,
+            Cpf: cpf,
+            Email: email,
         };
 
         if (senha.trim()) {
@@ -105,16 +105,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.ok) {
-                const result = await response.json();
-                if (result.Success) { // Sua API pode retornar 'Success' ou 'success'
-                    alert(result.Message || 'Perfil atualizado com sucesso!');
-                    localStorage.setItem('userName', nome);
-                    localStorage.setItem('userCpf', cpf);
-                    localStorage.setItem('userEmail', email);
-                    window.location.href = 'home.html';
-                } else {
-                    alert('Falha ao atualizar perfil: ' + (result.Message || 'Erro desconhecido.'));
-                }
+                // Se a resposta for OK (status 200-299), assume que foi um sucesso
+                const result = await response.json(); // Tenta ler a resposta JSON, mesmo que não precise de 'Success'
+                alert(result.message || 'Perfil atualizado com sucesso!'); // Use result.message if available, otherwise a generic success message
+                localStorage.setItem('userName', nome);
+                localStorage.setItem('userCpf', cpf);
+                localStorage.setItem('userEmail', email);
+                window.location.href = 'home.html';
             } else if (response.status === 400) {
                 const errorResult = await response.json();
                 // Mostra a mensagem de erro específica da API
