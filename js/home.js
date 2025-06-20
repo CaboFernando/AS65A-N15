@@ -2,6 +2,11 @@ const form = document.getElementById("familia-form");
 const lista = document.getElementById("lista-membros");
 const resultado = document.getElementById("resultado-renda");
 
+// Dropdown elements
+const grauParentescoSelect = document.getElementById('grauParentesco');
+const sexoSelect = document.getElementById('sexo');
+const estadoCivilSelect = document.getElementById('estadoCivil');
+
 let membros = [];
 
 function logout() {
@@ -15,6 +20,23 @@ if (!token) {
     alert("Você precisa estar autenticado para cadastrar a família");
     window.location.href = "index.html"; // redireciona para o login, caso não tenha token
 }
+
+
+window.addEventListener('DOMContentLoaded', () => {
+    preencherSelect(
+      'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/DropDowns/tipos-parentesco',
+      document.getElementById('grauParentesco')
+    );
+    preencherSelect(
+      'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/DropDowns/generos',
+      document.getElementById('sexo')
+    );
+    preencherSelect(
+      'https://bolsafamilia-api-c3agdmbpdnhxaufz.brazilsouth-01.azurewebsites.net/api/DropDowns/estados-civis',
+      document.getElementById('estadoCivil')
+    );
+  });
+  
 
 // =========================================================
 // Definições das funções
@@ -54,15 +76,8 @@ function calcularRenda() {
 }
 
 async function cadastrarFamilia(membros) {
-    const sexoMap = { "M": 1, "F": 2, "Outro": 3, "NaoInformado": 0 };
-    const estadoCivilMap = {
-        "NaoInformado": 0,
-        "Solteiro": 1,
-        "Casado": 2,
-        "Divorciado": 3,
-        "Viuvo": 4,
-        "UniaoEstavel": 5
-    };
+    const sexoMap = { };
+    const estadoCivilMap = { };
 
     for (const membro of membros) {
         const body = {
@@ -91,6 +106,39 @@ async function cadastrarFamilia(membros) {
         }
     }
 }
+
+//função de preencher selects
+async function preencherSelect(url, selectElement) {
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
+  
+      if (result.success && Array.isArray(result.data)) {
+  
+        result.data.forEach(item => {
+          const option = document.createElement('option');
+  
+          if (typeof item === 'string') {
+            // Quando o item é apenas um texto (ex: grau de parentesco)
+            option.value = item;
+            option.textContent = item;
+          } else if (typeof item === 'object' && item !== null) {
+            // Quando o item é um objeto com value e name
+            option.value = item.value;
+            option.textContent = item.name;
+          }
+  
+          selectElement.appendChild(option);
+        });
+      } else {
+        console.error('Erro ao obter dados da API:', result.message);
+      }
+    } catch (error) {
+      console.error('Erro na requisição:', error);
+    }
+  }
+  
+  
 
 // =========================================================
 // Evento de envio do formulário
